@@ -6,4 +6,7 @@ namespace TerraMachina.Abstractions.Enums;
 
 public enum BoundaryType
 {
+    Convergent,
+    Divergent,
+    Transform
 }
