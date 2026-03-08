@@ -19,6 +19,7 @@ namespace TerraMachina.Abstractions.Circulation;
 /// </summary>
 public interface IAtmosphericNode
 {
+    int NodeId { get; init; }
     int[] CellIds { get; }
     List<IAtmosphericNode> LateralNeighbors { get; init; }
 }

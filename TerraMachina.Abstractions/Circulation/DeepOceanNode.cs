@@ -18,6 +18,7 @@ namespace TerraMachina.Abstractions.Circulation;
 /// </summary>
 public class DeepOceanNode : IOceanNode
 {
+    public int NodeId { get; init; }
     public int[] CellIds { get; init; } = [];
     public float Temperature { get; set; }
     public float Salinity { get; set; }
