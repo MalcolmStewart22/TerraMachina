@@ -9,5 +9,5 @@ public class World
     public CellMap Surface = new();
     public GeologyData Geology = new();
     public HydrologyData Hydrology = new();
-    public CirculationSystem Circulation = new();
+    public CirculationSystems Circulation = new();
 }
