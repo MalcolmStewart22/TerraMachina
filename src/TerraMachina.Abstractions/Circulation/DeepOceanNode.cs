@@ -28,7 +28,7 @@ public class DeepOceanNode : IOceanNode
     public List<IOceanNode> Previous { get; set; } = [];
     public List<IOceanNode> LateralNeighbors { get; init;} = [];
 
-    public SurfaceOceanNode UpwellingNeighbor { get; init;}
+    public required SurfaceOceanNode UpwellingNeighbor { get; init;}
     public float AverageDepth { get; set; }
 }
 

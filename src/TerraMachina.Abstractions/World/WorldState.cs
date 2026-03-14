@@ -6,8 +6,8 @@ namespace TerraMachina.Abstractions.World;
 
 public class World
 {
-    public CellMap Surface = new();
-    public GeologyData Geology = new();
-    public HydrologyData Hydrology = new();
-    public CirculationSystems Circulation = new();
+    public required CellMap Surface { get; set; }
+    public required GeologyData Geology { get; set; }
+    public required HydrologyData Hydrology { get; set; }
+    public required CirculationSystems Circulation { get; set; }
 }

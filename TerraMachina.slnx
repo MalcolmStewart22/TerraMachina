@@ -1,6 +1,6 @@
 <Solution>
   <Project Path="src/TerraMachina.Abstractions/TerraMachina.Abstractions.csproj" Id="425a673d-0b4f-42b5-8836-c6cc87a910d4" />
-  <Project Path="src/TerraMachina.Runtime/TerraMachina.Runtime.csproj" Id="be391c83-a8e5-4cc4-89c8-5be1f8067c38" />
   <Project Path="src/TerraMachina.WorldGen/TerraMachina.WorldGen.csproj" Id="9e1077ef-852d-46f8-b877-9ba7d569b84b" />
   <Project Path="src/TerraMachina.WorldSim/TerraMachina.WorldSim.csproj" Id="d8390877-a522-4fdd-985f-a6d121297c5f" />
+  <Project Path="TerraMachina.Runtime/TerraMachina.Runtime.csproj" Id="547aea14-a2ab-490b-84f7-c5b30a68503e" />
 </Solution>
