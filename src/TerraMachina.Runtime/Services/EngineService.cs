@@ -14,7 +14,7 @@ public class EngineService : IEngineService
         _hubContext = hubContext;
     }
 
-    public Task StartWorldGenAsync(int seed, int cellCount)
+    public Task StartWorldGenAsync(int seed, int subdivisionLevel)
     {
         if (State != EngineState.Idle)
         {
@@ -23,12 +23,12 @@ public class EngineService : IEngineService
 
         State = EngineState.Generating;
 
-        _ = RunWorldGenAsync(seed, cellCount);
+        _ = RunWorldGenAsync(seed, subdivisionLevel);
 
         return Task.CompletedTask;
     }
 
-    private async Task RunWorldGenAsync(int seed, int cellCount)
+    private async Task RunWorldGenAsync(int seed, int subdivisionLevel)
     {
         try
         {

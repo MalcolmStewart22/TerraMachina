@@ -22,7 +22,7 @@ public class WorldGenController : ControllerBase
             return Conflict("Engine is already running.");
         }
 
-        await _engineService.StartWorldGenAsync(request.Seed, request.CellCount);
+        await _engineService.StartWorldGenAsync(request.Seed, request.SubdivisionLevel);
         return Accepted();
     }
 }

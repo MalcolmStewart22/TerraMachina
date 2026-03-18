@@ -3,5 +3,5 @@
 public class StartWorldGenRequest
 {
     public int Seed { get; init; }
-    public int CellCount { get; init; }
+    public int SubdivisionLevel { get; init; }
 }
