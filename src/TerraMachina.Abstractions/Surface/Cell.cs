@@ -7,9 +7,7 @@ namespace TerraMachina.Abstractions.Surface;
 
 public class Cell
 {
-    public int CellId { get; init; }
-    public Vector3 Position { get; init; }
-    public int[] NeighborsById { get; init; } = new int[3];
+    public CellGeometry Geometry { get; init; }
     public bool IsOcean { get; set; }
     public BiomeType Biome { get; set; }
     //Resources

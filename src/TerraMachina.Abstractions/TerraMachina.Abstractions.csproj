@@ -7,4 +7,8 @@
 	  <RootNamespace>TerraMachina.Abstractions</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="ProgressUpdate\WorldSim\" />
+  </ItemGroup>
+
 </Project>
