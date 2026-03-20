@@ -6,5 +6,13 @@ namespace TerraMachina.Abstractions.ProgressUpdate.WorldGen;
 
 public class GeometryProgressPayload : IWorldGenPayload
 {
-    public required List<CellGeometry> Sphere { get; init; }
+    public List<CellGeometry> Sphere { get; init; } = new();
+
+    public GeometryProgressPayload(CellMap cellMap)
+    {
+        foreach (Cell c in cellMap.Cells)
+        {
+            Sphere.Add(c.Geometry);
+        }
+    }
 }

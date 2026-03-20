@@ -9,6 +9,7 @@ public enum WorldGenStepTypes
     GeneratingIcosahedron,
     Subdividing,
     ProjectingToSphere,
+    BuildingCells,
     SimulatingPlateMovement,
     FillingOceans,
     GeneratingAtmosphericCurrents,
