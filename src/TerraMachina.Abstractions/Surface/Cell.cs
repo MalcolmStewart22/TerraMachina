@@ -15,10 +15,10 @@ public class Cell
     public Dictionary<FaunaResource, ResourceDeposit>? FaunaResources { get; set; } //Resource -> Quantity, Quality
     public Dictionary<FloraResource, ResourceDeposit>? FloraResources { get; set; } //Resource -> Quantity, Quality
     //Geology Data
-    public int Elevation { get; init; }
-    public SoilType Soil { get; init; }
+    public int Elevation { get; set; }
+    public SoilType Soil { get; set; }
     public float CurrentFertility { get; set; }
-    public BedrockType Bedrock { get; init; }
+    public BedrockType Bedrock { get; set; }
     //Hydrology Data
     public int? RiverId { get; set; }
     public int? LakeId { get; set; }
@@ -32,4 +32,10 @@ public class Cell
     //Atmosphere Data
     public float Temperature { get; set; }
     public float Humidty { get; set; }
+
+
+    public Cell(CellGeometry geo)
+    {
+        Geometry = geo;
+    }
 }

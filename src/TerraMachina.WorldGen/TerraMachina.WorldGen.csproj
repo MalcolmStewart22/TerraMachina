@@ -6,4 +6,15 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="Circulation\" />
+    <Folder Include="Climate\" />
+    <Folder Include="Resources\" />
+    <Folder Include="Tectonics\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TerraMachina.Abstractions\TerraMachina.Abstractions.csproj" />
+  </ItemGroup>
+
 </Project>
