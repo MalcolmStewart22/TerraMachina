@@ -8,4 +8,10 @@ public class WorldGenParameters
 {
     public int Seed { get; init; }
     public int SubdivisionLevels { get; init; }
+
+    public WorldGenParameters(int seed, int subdivisionLevels)
+    {
+        Seed = seed;
+        SubdivisionLevels = subdivisionLevels;
+    }
 }

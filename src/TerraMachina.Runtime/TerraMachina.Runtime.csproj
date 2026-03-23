@@ -11,4 +11,10 @@
     <PackageReference Include="Scalar.AspNetCore" Version="2.13.8" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\TerraMachina.Abstractions\TerraMachina.Abstractions.csproj" />
+    <ProjectReference Include="..\TerraMachina.WorldGen\TerraMachina.WorldGen.csproj" />
+    <ProjectReference Include="..\TerraMachina.WorldSim\TerraMachina.WorldSim.csproj" />
+  </ItemGroup>
+
 </Project>
