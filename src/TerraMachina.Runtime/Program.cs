@@ -1,5 +1,6 @@
 using Scalar.AspNetCore;
 using TerraMachina.Runtime.Hubs;
+using TerraMachina.Runtime.JSON;
 using TerraMachina.Runtime.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,6 +19,18 @@ builder.Services.AddCors(options =>
               .AllowCredentials();
     });
 });
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+        options.JsonSerializerOptions.Converters.Add(new Vector3JsonConverter());
+    });
+builder.Services.AddSignalR()
+    .AddJsonProtocol(options =>
+    {
+        options.PayloadSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+        options.PayloadSerializerOptions.Converters.Add(new Vector3JsonConverter());
+    });
 
 var app = builder.Build();
 

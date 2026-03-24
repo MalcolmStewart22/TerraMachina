@@ -14,5 +14,6 @@ public class GeometryProgressPayload : IWorldGenPayload
         {
             Sphere.Add(c.Geometry);
         }
+        Console.WriteLine("Cells Generated: " + Sphere.Count);
     }
 }
