@@ -49,7 +49,7 @@ public class EngineService : IEngineService
 
             _world = await wgRunner.RunAsync(parameters,progress);
 
-            State = EngineState.Ready;
+            State = EngineState.Idle;
             Console.WriteLine("World Gen Completed!");
             Console.WriteLine($"Cells generated: {_world.Surface.Cells.Count}");
             await _hubContext.Clients.All.SendAsync("WorldGenComplete");

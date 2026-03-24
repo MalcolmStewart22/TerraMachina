@@ -87,7 +87,7 @@ public class IcoSphereGenerator
         // Upper middle
         Triangles.Add((1, 5, 9));
         Triangles.Add((5, 11, 4));
-        Triangles.Add((10, 7, 2));
+        Triangles.Add((11, 10, 2));
         Triangles.Add((10, 7, 6));
         Triangles.Add((7, 1, 8));
         // Bottom cap
