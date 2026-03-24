@@ -60,47 +60,48 @@ public class IcoSphereGenerator
     private void GenerateIcosahedron()
     {
         //create vertices
-        // YZ Plane
-        Vertices.Add(new Vector3(0, 1, (float)GoldRatio));   // 0
-        Vertices.Add(new Vector3(0, -1, (float)GoldRatio));  // 1
-        Vertices.Add(new Vector3(0, 1, -(float)GoldRatio));  // 2
-        Vertices.Add(new Vector3(0, -1, -(float)GoldRatio)); // 3
-        // XZ Plane
-        Vertices.Add(new Vector3((float)GoldRatio, 0, 1));   // 4
-        Vertices.Add(new Vector3((float)GoldRatio, 0, -1));  // 5
-        Vertices.Add(new Vector3(-(float)GoldRatio, 0, 1));  // 6
-        Vertices.Add(new Vector3(-(float)GoldRatio, 0, -1)); // 7
         // XY Plane
-        Vertices.Add(new Vector3(1, (float)GoldRatio, 0));   // 8
-        Vertices.Add(new Vector3(-1, (float)GoldRatio, 0));  // 9
-        Vertices.Add(new Vector3(1, -(float)GoldRatio, 0));  // 10
-        Vertices.Add(new Vector3(-1, -(float)GoldRatio, 0)); // 11
+        Vertices.Add(new Vector3(-1, (float)GoldRatio, 0));
+        Vertices.Add(new Vector3(1, (float)GoldRatio, 0));
+        Vertices.Add(new Vector3(-1, -(float)GoldRatio, 0));
+        Vertices.Add(new Vector3(1, -(float)GoldRatio, 0));
+        // YZ Plane
+        Vertices.Add(new Vector3(0, -1, (float)GoldRatio));
+        Vertices.Add(new Vector3(0, 1, (float)GoldRatio));
+        Vertices.Add(new Vector3(0, -1, -(float)GoldRatio));
+        Vertices.Add(new Vector3(0, 1, -(float)GoldRatio));
+        // XZ Plane
+        Vertices.Add(new Vector3((float)GoldRatio, 0, -1));
+        Vertices.Add(new Vector3((float)GoldRatio, 0, 1));
+        Vertices.Add(new Vector3(-(float)GoldRatio, 0, -1));
+        Vertices.Add(new Vector3(-(float)GoldRatio, 0, 1));  
+        
 
         //create Triangles
         // Top cap
-        Triangles.Add((0, 8, 4));
-        Triangles.Add((0, 4, 1));
-        Triangles.Add((0, 1, 6));
-        Triangles.Add((0, 6, 9));
-        Triangles.Add((0, 9, 8));
+        Triangles.Add((0, 11, 5));
+        Triangles.Add((0, 5, 1));
+        Triangles.Add((0, 1, 7));
+        Triangles.Add((0, 7, 10));
+        Triangles.Add((0, 10, 11));
         // Upper middle
-        Triangles.Add((8, 5, 4));
-        Triangles.Add((4, 10, 1));
-        Triangles.Add((1, 11, 6));
-        Triangles.Add((6, 7, 9));
-        Triangles.Add((9, 2, 8));
-        // Lower middle
-        Triangles.Add((5, 8, 2));
-        Triangles.Add((10, 5, 3));
-        Triangles.Add((11, 10, 7));
-        Triangles.Add((7, 11, 2));
-        Triangles.Add((2, 9, 7));
+        Triangles.Add((1, 5, 9));
+        Triangles.Add((5, 11, 4));
+        Triangles.Add((10, 7, 2));
+        Triangles.Add((10, 7, 6));
+        Triangles.Add((7, 1, 8));
         // Bottom cap
-        Triangles.Add((3, 5, 10));
-        Triangles.Add((3, 10, 11));
-        Triangles.Add((3, 11, 7));
-        Triangles.Add((3, 7, 2));
-        Triangles.Add((3, 2, 5));
+        Triangles.Add((3, 9, 4));
+        Triangles.Add((3, 4, 2));
+        Triangles.Add((3, 2, 6));
+        Triangles.Add((3, 6, 8));
+        Triangles.Add((3, 8, 9));
+        // Lower middle
+        Triangles.Add((4, 9, 5));
+        Triangles.Add((2, 4, 11));
+        Triangles.Add((6, 2, 10));
+        Triangles.Add((8, 6, 7));
+        Triangles.Add((9, 8, 1));
     }
     private void SubdivideIcosahedron(int subdivisionLevels)
     {
@@ -109,18 +110,14 @@ public class IcoSphereGenerator
 
         foreach (var tri in oldTriangles)
         {
-            int vertexA = tri.a;
-            int vertexB = tri.b;
-            int vertexC = tri.c;
+            int a = FindOrCreateMidPoint(tri.a, tri.b);
+            int b = FindOrCreateMidPoint(tri.b, tri.c);
+            int c = FindOrCreateMidPoint(tri.c, tri.a);
 
-            int vertexD = FindOrCreateMidPoint(vertexA, vertexB);
-            int vertexE = FindOrCreateMidPoint(vertexA, vertexC);
-            int vertexF = FindOrCreateMidPoint(vertexB, vertexC);
-
-            Triangles.Add((vertexA, vertexD, vertexE));
-            Triangles.Add((vertexB, vertexD, vertexF));
-            Triangles.Add((vertexC, vertexE, vertexF));
-            Triangles.Add((vertexD, vertexE, vertexF));
+            Triangles.Add((tri.a, a, c));
+            Triangles.Add((tri.b, b, a));
+            Triangles.Add((tri.c, c, b));
+            Triangles.Add((a, b, c));
         }
 
         if ( subdivisionLevels - 1 > 0)
