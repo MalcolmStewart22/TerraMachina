@@ -14,12 +14,10 @@ public class GeometryProgressPayload : IWorldGenPayload
         {
             Sphere.Add(new CellGeometryMinimum(c.Geometry));
         }
-        Console.WriteLine("Cells Generated: " + Sphere.Count);
     }
     public GeometryProgressPayload(SpatialNode node)
     {
         Sphere = new List<CellGeometryMinimum>(CollectGeometry(node));
-        Console.WriteLine("Cells Generated: " + Sphere.Count);
     }
 
     private List<CellGeometryMinimum> CollectGeometry(SpatialNode root)

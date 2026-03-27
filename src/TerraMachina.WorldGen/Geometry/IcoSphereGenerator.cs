@@ -192,7 +192,7 @@ public class IcoSphereGenerator
                             CurrentStep = WorldGenStepTypes.BuildingCells,
                             Payload = new GeometryProgressPayload(x)
                         });
-                        await Task.Delay(100);
+                        await Task.Delay(20);
                         Console.WriteLine(progressCount);
                         progressCount++;
                     }

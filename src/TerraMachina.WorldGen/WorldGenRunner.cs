@@ -19,7 +19,7 @@ public class WorldGenRunner
         progress.Report(new WorldGenProgressUpdate
         {
             CurrentStage = WorldGenStageTypes.Starting,
-            StageProgress = 20 * 4 * parameters.SubdivisionLevels,
+            StageProgress = 20 * (float)Math.Pow(4, parameters.SubdivisionLevels),
         });
         IcoSphereGenerator icosphereGen = new();
         icosphereGen.GenerateSphere(world.Surface, progress, parameters.SubdivisionLevels);

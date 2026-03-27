@@ -34,7 +34,6 @@ function WorldSphere() {
         }
         if(latestUpdate?.currentStage == 'Starting')
         {
-            workerRef.current.postMessage({type: 'geometryClear',})
             workerRef.current.postMessage({type: 'prepare', cellCount: latestUpdate.stageProgress})
         }
     }, [latestUpdate])
