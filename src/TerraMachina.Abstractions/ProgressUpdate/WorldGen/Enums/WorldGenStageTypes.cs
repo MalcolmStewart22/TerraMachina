@@ -6,6 +6,7 @@ namespace TerraMachina.Abstractions.ProgressUpdate.WorldGen.Enums;
 
 public enum WorldGenStageTypes
 {
+    Starting,
     Geometry,
     Tectonic,
     Circulation,

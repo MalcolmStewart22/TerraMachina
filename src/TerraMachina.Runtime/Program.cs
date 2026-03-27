@@ -7,7 +7,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
-builder.Services.AddSignalR();
+builder.Services.AddSignalR(options =>
+{
+    options.MaximumReceiveMessageSize = null; // no limit
+    options.StreamBufferCapacity = 20;
+});
 builder.Services.AddSingleton<IEngineService, EngineService>();
 builder.Services.AddCors(options =>
 {

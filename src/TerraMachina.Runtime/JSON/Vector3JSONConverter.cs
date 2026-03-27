@@ -25,9 +25,9 @@ public class Vector3JsonConverter : JsonConverter<Vector3>
     public override void Write(Utf8JsonWriter writer, Vector3 value, JsonSerializerOptions options)
     {
         writer.WriteStartObject();
-        writer.WriteNumber("x", value.X);
-        writer.WriteNumber("y", value.Y);
-        writer.WriteNumber("z", value.Z);
+        writer.WriteNumber("x", Math.Round(value.X, 4));
+        writer.WriteNumber("y", Math.Round(value.Y, 4));
+        writer.WriteNumber("z", Math.Round(value.Z, 4));
         writer.WriteEndObject();
     }
 }

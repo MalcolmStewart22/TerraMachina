@@ -1,10 +1,14 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using TerraMachina.Runtime.Hubs;
-using TerraMachina.WorldGen;
+using TerraMachina.Abstractions.Circulation;
+using TerraMachina.Abstractions.Geology;
+using TerraMachina.Abstractions.Hydrology;
 using TerraMachina.Abstractions.Parameters;
 using TerraMachina.Abstractions.ProgressUpdate;
 using TerraMachina.Abstractions.ProgressUpdate.WorldGen;
+using TerraMachina.Abstractions.Surface;
 using TerraMachina.Abstractions.World;
+using TerraMachina.Runtime.Hubs;
+using TerraMachina.WorldGen;
 
 namespace TerraMachina.Runtime.Services;
 
@@ -18,6 +22,13 @@ public class EngineService : IEngineService
     public EngineService(IHubContext<EngineHub> hubContext)
     {
         _hubContext = hubContext;
+        _world = new World
+            (
+                new CellMap(),
+                new GeologyData(),
+                new HydrologyData(),
+                new CirculationSystems()
+            );
     }
 
     public Task StartWorldGenAsync(int seed, int subdivisionLevel)
@@ -40,14 +51,14 @@ public class EngineService : IEngineService
     {
         try
         {
-            var progress = new Progress<WorldGenProgressUpdate>(update =>
+            var progress = new SynchronousProgress<WorldGenProgressUpdate>(async update =>
             {
-                _ = _hubContext.Clients.All.SendAsync("WorldGenProgress", update);
+                await _hubContext.Clients.All.SendAsync("WorldGenProgress", update);
             });
 
             WorldGenRunner wgRunner = new WorldGenRunner();
 
-            _world = await wgRunner.RunAsync(parameters,progress);
+            await wgRunner.RunAsync(parameters,progress, _world);
 
             State = EngineState.Idle;
             Console.WriteLine("World Gen Completed!");
