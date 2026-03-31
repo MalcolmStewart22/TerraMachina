@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace TerraMachina.Abstractions.ProgressUpdate.WorldGen;
+namespace TerraMachina.Abstractions.ProgressUpdate.WorldGen.Geometry;
 
 public class GeometryProgressPayload : IWorldGenPayload
 {

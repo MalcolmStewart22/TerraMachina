@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Numerics;
 using System.Text;
 
-namespace TerraMachina.Abstractions.ProgressUpdate.WorldGen;
+namespace TerraMachina.Abstractions.ProgressUpdate.WorldGen.Geometry;
 
 public  class CellGeometryMinimum
 {
