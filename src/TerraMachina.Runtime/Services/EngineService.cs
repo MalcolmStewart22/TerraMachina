@@ -17,7 +17,7 @@ public class EngineService : IEngineService
     private readonly IHubContext<EngineHub> _hubContext;
     public World _world;
 
-    public EngineState State { get; private set; } = EngineState.Idle;
+    public EngineState State { get; set; } = EngineState.Idle;
 
     public EngineService(IHubContext<EngineHub> hubContext)
     {
@@ -39,8 +39,15 @@ public class EngineService : IEngineService
         }
 
         State = EngineState.Generating;
+       
+        _world = new World
+            (
+                new CellMap(),
+                new GeologyData(),
+                new HydrologyData(),
+                new CirculationSystems()
+            );
 
-        
         WorldGenParameters parameters = new WorldGenParameters(seed, subdivisionLevel);
         _ = RunWorldGenAsync(parameters);
 
@@ -56,13 +63,19 @@ public class EngineService : IEngineService
                 await _hubContext.Clients.All.SendAsync("WorldGenProgress", update);
             });
 
-            WorldGenRunner wgRunner = new WorldGenRunner();
+            WorldGenRunner wgRunner = new WorldGenRunner(parameters, progress, _world);
 
-            await wgRunner.RunAsync(parameters,progress, _world);
+            await wgRunner.RunGeometryAsync();
 
-            State = EngineState.Idle;
-            Console.WriteLine("World Gen Completed!");
+            State = EngineState.Waiting;
+            Console.WriteLine("WorldGen Geometry Completed!");
             Console.WriteLine($"Cells generated: {_world.Surface.Cells.Count}");
+            while(State == EngineState.Waiting)
+            {
+                await Task.Delay(50);
+            }
+            await wgRunner.RunTectonicsAsync();
+
             await _hubContext.Clients.All.SendAsync("WorldGenComplete");
         }
         catch (Exception ex)

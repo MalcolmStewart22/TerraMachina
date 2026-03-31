@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Numerics;
 using System.Text;
 using TerraMachina.Abstractions.ProgressUpdate.WorldGen;
+using TerraMachina.Abstractions.ProgressUpdate.WorldGen.Geometry;
 using TerraMachina.Abstractions.ProgressUpdate.WorldGen.Enums;
 using TerraMachina.Abstractions.Surface;
 
@@ -78,6 +79,7 @@ public class IcoSphereGenerator
                 StageProgress = 1f,
             });
         }
+
     }
     private void GenerateIcosahedron()
     {

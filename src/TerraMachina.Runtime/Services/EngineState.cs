@@ -4,6 +4,7 @@ public enum EngineState
 {
     Idle,
     Generating,
+    Waiting,
     Ready,
     Simulating
 }

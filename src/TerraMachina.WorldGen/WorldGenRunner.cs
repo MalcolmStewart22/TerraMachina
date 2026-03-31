@@ -8,21 +8,36 @@ using TerraMachina.Abstractions.ProgressUpdate.WorldGen.Enums;
 using TerraMachina.Abstractions.Surface;
 using TerraMachina.Abstractions.World;
 using TerraMachina.WorldGen.Geometry;
+using TerraMachina.WorldGen.Tectonics;
 
 namespace TerraMachina.WorldGen;
 
 public class WorldGenRunner
 {
-
-    public async Task RunAsync(WorldGenParameters parameters, IProgress<WorldGenProgressUpdate> progress, World world)
+    private World currentWorld;
+    private IProgress<WorldGenProgressUpdate> currentProgress;
+    private WorldGenParameters currentParameters;
+    public WorldGenRunner(WorldGenParameters parameters, IProgress<WorldGenProgressUpdate> progress, World world)
     {
-        progress.Report(new WorldGenProgressUpdate
+        currentWorld = world;
+        currentProgress = progress;
+        currentParameters = parameters;
+    }
+    public async Task RunGeometryAsync()
+    {
+        currentProgress.Report(new WorldGenProgressUpdate
         {
             CurrentStage = WorldGenStageTypes.Starting,
-            StageProgress = 20 * (float)Math.Pow(4, parameters.SubdivisionLevels),
+            StageProgress = 20 * (float)Math.Pow(4, currentParameters.SubdivisionLevels),
         });
         IcoSphereGenerator icosphereGen = new();
-        icosphereGen.GenerateSphere(world.Surface, progress, parameters.SubdivisionLevels);
+        icosphereGen.GenerateSphere(currentWorld.Surface, currentProgress, currentParameters.SubdivisionLevels);
+    }
+
+    public async Task RunTectonicsAsync()
+    {
+        TectonicGenerator tectonicGen = new();
+        tectonicGen.G
     }
 
 }

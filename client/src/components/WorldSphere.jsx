@@ -29,13 +29,27 @@ function WorldSphere() {
 
     useEffect(() => {
         console.log(latestUpdate)
-        if (latestUpdate?.payload && workerRef.current){
-            workerRef.current.postMessage({type: 'geometry', payload: latestUpdate.payload })
-        }
-        if(latestUpdate?.currentStage == 'Starting')
+        
+        if(!workerRef.current) return
+
+        //Render Setup
+        if(latestUpdate?.currentStage === 'Starting')
         {
             workerRef.current.postMessage({type: 'prepare', cellCount: latestUpdate.stageProgress})
         }
+
+        // Geometry Messages
+        if(latestUpdate?.currentStage === "Geometry"){
+            if (latestUpdate?.payload){
+                workerRef.current.postMessage({type: 'geometry', payload: latestUpdate.payload })
+            }
+            if(latestUpdate?.stageProgress === 1){
+                workerRef.current.postMessage({type: 'lod', payload: latestUpdate.payload })
+            }
+        }
+        
+        //Tectonic Messages
+        
     }, [latestUpdate])
 
     return (

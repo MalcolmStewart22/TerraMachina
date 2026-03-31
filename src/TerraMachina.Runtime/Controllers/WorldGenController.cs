@@ -25,4 +25,16 @@ public class WorldGenController : ControllerBase
         await _engineService.StartWorldGenAsync(request.Seed, request.SubdivisionLevel);
         return Accepted();
     }
+
+    [HttpPost("ready")]
+    public async Task<IActionResult> UpdateEngineStatusAsync()
+    {
+        if (_engineService.State != EngineState.Waiting)
+        {
+            return Conflict("Engine is not waiting.");
+        }
+
+        _engineService.State = EngineState.Ready;
+        return Accepted();
+    }
 }

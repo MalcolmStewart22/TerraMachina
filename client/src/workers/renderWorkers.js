@@ -1,12 +1,14 @@
 import * as THREE from 'three';
 import { OrbitControls } from "three/examples/jsm/Addons.js";
 import { ProxyManager } from './ElementProxyReceiver.js';
+import { sendReadySignal } from "../api/engineApi";
 
 
 let scene, camera, renderer, controls, animationId
 let mesh, lines
-let cellcount, positionBuffer, positionAttribute, offset
+let cellcount, positionBuffer, positionAttribute, offset, cellOffset
 let pendingBatches = []
+const cellIDMap = new Map()
 const proxyManager = new ProxyManager()
 
 
@@ -17,7 +19,7 @@ const handlers = {
     makeProxy: (data) => proxyManager.makeProxy(data),
     event: proxyManager.handleEvent,
     prepare: handlePrepare,
-
+    lod: handleLODs,
 }
 
 self.onmessage = (e) => {
@@ -70,6 +72,8 @@ function handleGeometry(data){
     }
     const payload = data.payload
     for (const cell of payload.sphere){
+        cellIDMap.set(cell.ID, cellOffset)
+        cellOffset += 9
         for (const vertex of cell.v){
             positionBuffer[offset] = vertex.x
             positionBuffer[offset + 1] = vertex.y
@@ -86,6 +90,8 @@ function handlePrepare(data){
     cellcount = data.cellCount
     console.log(cellcount)
     offset = 0
+    cellOffset = 0
+    cellIDMap.clear()
     positionBuffer = new Float32Array(cellcount * 9)
     positionAttribute = new THREE.BufferAttribute(positionBuffer, 3)
     positionAttribute.setUsage(THREE.DynamicDrawUsage)
@@ -112,3 +118,13 @@ function handlePrepare(data){
     }
 }
 
+function handleLODs(data){
+    // Create LODs
+    // Do work
+    // We will deal with this later
+    readyForNextPhase()
+}
+
+async function readyForNextPhase(){
+    await sendReadySignal()
+}

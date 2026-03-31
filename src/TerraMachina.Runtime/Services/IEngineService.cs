@@ -2,6 +2,6 @@
 
 public interface IEngineService
 {
-    EngineState State { get; }
+    EngineState State { get; set; }
     Task StartWorldGenAsync(int seed, int subdivisionLevel);
 }
