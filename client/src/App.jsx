@@ -1,5 +1,5 @@
-import WorldGenForm from "./components/WorldGenForm"
-import WorldSphere from "./components/WorldSphere"
+import WorldControls from "./components/WorldControls"
+import WorldView from "./components/WorldView"
 
 
 
@@ -7,8 +7,8 @@ function App() {
   return (
     <div>
       <h1>TerraMachina</h1>
-      <WorldSphere/>
-      <WorldGenForm/>
+      <WorldView/>
+      <WorldControls/>
     </div>
   )
 }

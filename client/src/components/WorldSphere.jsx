@@ -1,14 +1,43 @@
-import { useEffect, useRef } from "react";
-import useEngineHub from "../hooks/useEngineHub";
+import { useEffect, useRef, forwardRef, useImperativeHandle  } from "react";
 import {ElementProxy, eventHandlers} from "../workers/ElementProxy";
 
-function WorldSphere() {
-    
+const WorldSphere = forwardRef((props, ref) =>{
     const canvasRef = useRef(null)
-    const latestUpdate = useEngineHub()
     const workerRef = useRef(null)
     const proxyRef = useRef(null)
-    
+    const handlerRef = useRef(null)
+
+    useImperativeHandle(ref, () => ({
+        newUpdate : (latestUpdate) => {
+            if(!workerRef.current) return
+            handlerRef.current = updateHandlers[latestUpdate?.currentStage]
+            if(handlerRef.current) handlerRef.current(latestUpdate)
+        }
+    }))
+
+    const updateHandlers = {
+        'Starting': handleStarting,
+        'Geometry': handleGeometry,
+        'Tectonics': handleTectonics
+    }
+
+    function handleStarting(latestUpdate){
+        workerRef.current.postMessage({type: 'prepare', cellCount: latestUpdate.stageProgress})
+    }
+    function handleGeometry(latestUpdate){
+        if (latestUpdate?.payload){
+            workerRef.current.postMessage({type: 'geometry', payload: latestUpdate.payload })
+        }
+        if(latestUpdate?.stageProgress === 1){
+            workerRef.current.postMessage({type: 'lod', payload: latestUpdate.payload })
+        }
+    }
+
+    function handleTectonics(latestUpdate){
+
+    }
+
+
     useEffect(() => {
         const worker = new Worker(
             new URL('../workers/renderWorkers.js', import.meta.url),
@@ -27,36 +56,11 @@ function WorldSphere() {
         }
     }, [])
 
-    useEffect(() => {
-        console.log(latestUpdate)
-        
-        if(!workerRef.current) return
-
-        //Render Setup
-        if(latestUpdate?.currentStage === 'Starting')
-        {
-            workerRef.current.postMessage({type: 'prepare', cellCount: latestUpdate.stageProgress})
-        }
-
-        // Geometry Messages
-        if(latestUpdate?.currentStage === "Geometry"){
-            if (latestUpdate?.payload){
-                workerRef.current.postMessage({type: 'geometry', payload: latestUpdate.payload })
-            }
-            if(latestUpdate?.stageProgress === 1){
-                workerRef.current.postMessage({type: 'lod', payload: latestUpdate.payload })
-            }
-        }
-        
-        //Tectonic Messages
-        
-    }, [latestUpdate])
-
     return (
         <div>
             <canvas ref={canvasRef} />
         </div>
     )
 
-}
+})
 export default WorldSphere;
