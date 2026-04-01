@@ -10,7 +10,6 @@
     <Folder Include="Circulation\" />
     <Folder Include="Climate\" />
     <Folder Include="Resources\" />
-    <Folder Include="Tectonics\" />
   </ItemGroup>
 
   <ItemGroup>

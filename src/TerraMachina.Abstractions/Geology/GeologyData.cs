@@ -6,6 +6,6 @@ namespace TerraMachina.Abstractions.Geology;
 
 public class GeologyData
 {
-    public List<TectonicPlate> Plates { get; init; } = new();
+    public List<Plate> Plates { get; init; } = new();
     public List<PlateBoundary> Boundaries { get; init; } = new();
 }

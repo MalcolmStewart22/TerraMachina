@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Folder Include="ProgressUpdate\WorldGen\Tectonics\" />
     <Folder Include="ProgressUpdate\WorldSim\" />
   </ItemGroup>
 

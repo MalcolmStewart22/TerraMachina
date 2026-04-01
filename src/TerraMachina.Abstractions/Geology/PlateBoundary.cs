@@ -11,8 +11,8 @@ namespace TerraMachina.Abstractions.Geology;
 public class PlateBoundary
 {
     public int BoundaryId { get; init; }
-    public TectonicPlate? PlateA { get; init; }
-    public TectonicPlate? PlateB { get; init; }
+    public Plate? PlateA { get; init; }
+    public Plate? PlateB { get; init; }
     public int[] CellIds { get; init; } = [];
     public BoundaryType BoundaryType { get; init; }
     public ConvergentType? ConvergentAngle { get; init; }
