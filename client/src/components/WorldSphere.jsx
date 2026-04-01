@@ -18,7 +18,7 @@ const WorldSphere = forwardRef((props, ref) =>{
     const updateHandlers = {
         'Starting': handleStarting,
         'Geometry': handleGeometry,
-        'Tectonics': handleTectonics
+        'Tectonic': handleTectonic
     }
 
     function handleStarting(latestUpdate){
@@ -33,7 +33,7 @@ const WorldSphere = forwardRef((props, ref) =>{
         }
     }
 
-    function handleTectonics(latestUpdate){
+    function handleTectonic(latestUpdate){
 
     }
 

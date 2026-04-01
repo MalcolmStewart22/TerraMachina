@@ -4,3 +4,7 @@ canvas {
     height: 80vh;
     padding: 50px;
 }
+.invalid{
+    border-color: red;
+    border-width: 3px;
+}
