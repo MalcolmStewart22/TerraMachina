@@ -6,12 +6,10 @@ namespace TerraMachina.Abstractions.Parameters;
 
 public class WorldGenParameters
 {
-    public int Seed { get; init; }
-    public int SubdivisionLevels { get; init; }
+    public GeometryParameters GeometryParameters { get; set; }
 
-    public WorldGenParameters(int seed, int subdivisionLevels)
+    public WorldGenParameters(GeometryParameters geometryParameters)
     {
-        Seed = seed;
-        SubdivisionLevels = subdivisionLevels;
+        GeometryParameters = geometryParameters;
     }
 }

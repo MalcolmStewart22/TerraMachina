@@ -8,6 +8,7 @@ using TerraMachina.Abstractions.ProgressUpdate.WorldGen;
 using TerraMachina.Abstractions.Surface;
 using TerraMachina.Abstractions.World;
 using TerraMachina.Runtime.Hubs;
+using TerraMachina.Runtime.Requests;
 using TerraMachina.WorldGen;
 
 namespace TerraMachina.Runtime.Services;
@@ -31,7 +32,7 @@ public class EngineService : IEngineService
             );
     }
 
-    public Task StartWorldGenAsync(int seed, int subdivisionLevel)
+    public Task StartWorldGenAsync(StartWorldGenRequest request)
     {
         if (State != EngineState.Idle)
         {
@@ -48,7 +49,7 @@ public class EngineService : IEngineService
                 new CirculationSystems()
             );
 
-        WorldGenParameters parameters = new WorldGenParameters(seed, subdivisionLevel);
+        WorldGenParameters parameters = new WorldGenParameters(request.Geometry);
         _ = RunWorldGenAsync(parameters);
 
         return Task.CompletedTask;

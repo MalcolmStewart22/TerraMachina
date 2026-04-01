@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 
 function WorldGenGeometryParameters({onParametersChange}) {
@@ -6,13 +6,13 @@ function WorldGenGeometryParameters({onParametersChange}) {
     const [subdivisionLevel, setSubdivisionLevel] = useState(6);
     const [isValid, setIsValid] = useState(true)
 
-
     const cellCount = 20 * 4 ** subdivisionLevel
     
     function rerollSeed(){
         let newSeed = Math.floor(Math.random() * 900_000) + 100_000
+        setIsValid(true)
         setSeed(newSeed)
-        onParametersChange("geometry", {seed, subdivisionLevel}, isValid)
+        onParametersChange("geometry", {newSeed, subdivisionLevel}, true)
     }
 
     function handleSeedChange(e){
@@ -26,30 +26,35 @@ function WorldGenGeometryParameters({onParametersChange}) {
     }
     function validateSeed(e){
         let parsedValue = parseInt(e.target.value)
+        let newValid
 
         if(Number.isNaN(parsedValue)){
-            setIsValid(false)
-            onParametersChange("geometry", {seed, subdivisionLevel}, isValid)
+            newValid = false
         }
-
         if(parsedValue < 100_000)
         {
-            setIsValid(false)
-            onParametersChange("geometry", {seed, subdivisionLevel}, isValid)
+            newValid = false
         }
-
         if(parsedValue > 99_999 && parsedValue < 1_000_000)
         {
-            setIsValid(true)
-            onParametersChange("geometry", {seed, subdivisionLevel}, isValid)
+            newValid = true
         }
+        setIsValid(newValid) 
         setSeed(parsedValue)
+        onParametersChange("geometry", {parsedValue, subdivisionLevel}, newValid)
     }
     function handleSubdivisionChange(e){
-        setSubdivisionLevel(parseInt(e.target.value))
-        onParametersChange("geometry", {seed, subdivisionLevel}, isValid)
+        newLevel = parseInt(e.target.value)
+        setSubdivisionLevel(newLevel)
+        onParametersChange("geometry", {seed, newLevel}, isValid)
     }
 
+
+    useEffect(() => {
+        console.log(seed + " " + subdivisionLevel)
+        onParametersChange("geometry", {seed, subdivisionLevel}, isValid) //upload 
+        return () => {}
+    }, [])
     return (
         <div>
             <label htmlFor="seed">Seed:</label>

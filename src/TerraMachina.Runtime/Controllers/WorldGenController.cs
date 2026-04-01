@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using TerraMachina.Runtime.Requests;
 using TerraMachina.Runtime.Services;
 
 namespace TerraMachina.Runtime.Controllers;
@@ -22,7 +23,7 @@ public class WorldGenController : ControllerBase
             return Conflict("Engine is already running.");
         }
 
-        await _engineService.StartWorldGenAsync(request.Seed, request.SubdivisionLevel);
+        await _engineService.StartWorldGenAsync(request);
         return Accepted();
     }
 

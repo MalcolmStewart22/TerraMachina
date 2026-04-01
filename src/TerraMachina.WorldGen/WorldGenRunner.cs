@@ -28,10 +28,10 @@ public class WorldGenRunner
         currentProgress.Report(new WorldGenProgressUpdate
         {
             CurrentStage = WorldGenStageTypes.Starting,
-            StageProgress = 20 * (float)Math.Pow(4, currentParameters.SubdivisionLevels),
+            StageProgress = 20 * (float)Math.Pow(4, currentParameters.GeometryParameters.SubdivisionLevel),
         });
         IcoSphereGenerator icosphereGen = new();
-        icosphereGen.GenerateSphere(currentWorld.Surface, currentProgress, currentParameters.SubdivisionLevels);
+        icosphereGen.GenerateSphere(currentWorld.Surface, currentProgress, currentParameters.GeometryParameters.SubdivisionLevel);
     }
 
     public async Task RunTectonicsAsync()
