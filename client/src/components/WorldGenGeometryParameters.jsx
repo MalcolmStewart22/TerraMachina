@@ -51,15 +51,16 @@ function WorldGenGeometryParameters({onParametersChange}) {
 
 
     useEffect(() => {
-        console.log(seed + " " + subdivisionLevel)
         onParametersChange("geometry", {seed, subdivisionLevel}, isValid) //upload 
         return () => {}
     }, [])
     return (
-        <div>
+        <div className="flex flex-col">
             <label htmlFor="seed">Seed:</label>
-            <input className={isValid ? "" : "invalid"} id="seed" type="number" value={seed} onChange={handleSeedChange} onBlur={validateSeed} title="Seed must be 6 digits"/>
-            <button onClick={rerollSeed}>New Seed</button>
+            <div>
+                <input className={isValid ? "" : "invalid"} id="seed" type="number" value={seed} onChange={handleSeedChange} onBlur={validateSeed} title="Seed must be 6 digits"/>
+                <button className="button-85 self-start text-sm" role="button" onClick={rerollSeed}>New Seed</button>
+            </div>
             <label htmlFor="subdivision">Cell Count: {cellCount}</label>
             <input id="subdivision" type="range" min="5" max="8" step="1" value={subdivisionLevel} onChange={handleSubdivisionChange} />
         </div>
