@@ -17,14 +17,17 @@ public class IcoSphereGenerator
     private List<Triangle> Triangles = new();
     private Dictionary<(int, int), int> MidpointLookup = new();
     private int progressCount = 1;
-    int nextID;
+    int nextCellID;
+    int nextNodeID;
 
     public async void GenerateSphere(CellMap cellMap, IProgress<WorldGenProgressUpdate> progress, int subdivisionLevel)
     {
         Vertices.Clear();
         Triangles.Clear();
         MidpointLookup.Clear();
-        nextID = 1;
+        nextCellID = 1;
+        nextNodeID = 1;
+
 
         progress.Report(new WorldGenProgressUpdate
         {
@@ -174,8 +177,8 @@ public class IcoSphereGenerator
                 if (currentTriangles[i].Level >= 2 && currentTriangles[i].Level % 2 == 0)
                 {
                     SpatialNode x = new();
-                    x.NodeID = nextID;
-                    nextID++;
+                    x.NodeID = nextNodeID;
+                    nextNodeID++;
                     x.Vertices[0] = Vertices[currentTriangles[i].a];
                     x.Vertices[1] = Vertices[currentTriangles[i].b];
                     x.Vertices[2] = Vertices[currentTriangles[i].c];
@@ -195,7 +198,6 @@ public class IcoSphereGenerator
                             Payload = new GeometryProgressPayload(x)
                         });
                         await Task.Delay(20);
-                        Console.WriteLine(progressCount);
                         progressCount++;
                     }
 
@@ -212,15 +214,15 @@ public class IcoSphereGenerator
                 verts[0] = Vertices[currentTriangles[i].a];
                 verts[1] = Vertices[currentTriangles[i].b];
                 verts[2] = Vertices[currentTriangles[i].c];
-                CellGeometry geo = new(nextID, pos, verts);
+                CellGeometry geo = new(nextCellID, pos, verts);
                 Cell newCell = new(geo);
                 cellMap.Cells.Add(newCell);
-                cellMap.CellById.Add(nextID, newCell);
-                nextID++;
+                cellMap.CellById.Add(nextCellID, newCell);
+                nextCellID++;
                 FindNeighbors(currentTriangles[i].a, currentTriangles[i].b, newCell, edges);
                 FindNeighbors(currentTriangles[i].a, currentTriangles[i].c, newCell, edges);
                 FindNeighbors(currentTriangles[i].b, currentTriangles[i].c, newCell, edges);
-                
+
                 currentNode.Children.Add(new SpatialLeaf(newCell));
             }
         }

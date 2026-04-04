@@ -9,6 +9,7 @@ namespace TerraMachina.WorldGen.Tectonics;
 public class TectonicPlate
 {
     public int PlateID { get; init; }
+    public string Name { get; init; }
     public List<int> ContainedCellIds { get; init; } = new();
     public float Speed { get; set; }
     public Vector3 EulerPolePosition { get; set; }

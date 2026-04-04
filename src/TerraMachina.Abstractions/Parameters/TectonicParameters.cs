@@ -43,6 +43,7 @@ public class TectonicParameters
     public float PlumeConnectivityDistance { get; set; } //as a percentage of plume radius
     public int PlumeMaxAge { get; set; }
     public int RidgeWidth { get; set; }
+    public float MaxLateralRidgeSway { get; set;  }
     public float VolcanoFrequency { get; set; }
     //Plates
     public float EulerPoleTolerance { get; set; }

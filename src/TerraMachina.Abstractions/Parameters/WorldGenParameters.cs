@@ -7,9 +7,10 @@ namespace TerraMachina.Abstractions.Parameters;
 public class WorldGenParameters
 {
     public GeometryParameters GeometryParameters { get; set; }
-
-    public WorldGenParameters(GeometryParameters geometryParameters)
+    public TectonicParameters TectonicParameters { get; set; }
+    public WorldGenParameters(GeometryParameters geometryParameters, TectonicParameters tectonicParameters)
     {
         GeometryParameters = geometryParameters;
+        TectonicParameters = tectonicParameters;
     }
 }

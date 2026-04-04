@@ -49,7 +49,7 @@ public class EngineService : IEngineService
                 new CirculationSystems()
             );
 
-        WorldGenParameters parameters = new WorldGenParameters(request.Geometry);
+        WorldGenParameters parameters = new WorldGenParameters(request.Geometry, request.Tectonic);
         _ = RunWorldGenAsync(parameters);
 
         return Task.CompletedTask;

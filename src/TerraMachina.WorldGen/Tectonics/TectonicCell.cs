@@ -14,9 +14,10 @@ public class TectonicCell
     public Vector3 CurrentDirection { get; set; }
     public float Speed { get; set; }
     public bool ActiveVolcano { get; set; }
-
+    public int? PlateId { get; set; }
     public TectonicCell(CellGeometry geometry)
     {
         Geometry = geometry;
+        Elevation = 0;
     }
 }

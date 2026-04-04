@@ -13,4 +13,13 @@ public class MantlePlume
     public List<int> CenterCellIds { get; init; } = new();
     public int Age {  get; set; }
     public int RadiusKm { get; init; }
+
+    //seed plumes
+    public MantlePlume(int id, Vector3 center, int size)
+    {
+        PlumeID = id;
+        Center = center;
+        Age = 0;
+        RadiusKm = size;
+    }
 }
