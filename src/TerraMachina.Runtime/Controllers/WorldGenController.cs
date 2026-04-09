@@ -28,14 +28,27 @@ public class WorldGenController : ControllerBase
     }
 
     [HttpPost("ready")]
-    public async Task<IActionResult> UpdateEngineStatusAsync()
+    public async Task<IActionResult> StartNextEnginePhaseAsync(StartNextWorldGenPhaseRequest request)
     {
-        if (_engineService.State != EngineState.Waiting)
+        if (_engineService.State != EngineState.Ready)
         {
-            return Conflict("Engine is not waiting.");
+            return Conflict("Engine is busy.");
         }
 
-        _engineService.State = EngineState.Ready;
+        Console.WriteLine("RUNTIME: Continue Order Recieved!" + request);
+        await _engineService.StartWorldGenPhaseAsync(request.Phase);
+        return Accepted();
+    }
+
+    [HttpPost("reset")]
+    public async Task<IActionResult> ResetEngine()
+    {
+        if (_engineService.State != EngineState.Ready)
+        {
+            return Conflict("Engine cannot currently be reset.");
+        }
+        Console.WriteLine("RUNTIME: RESETING ENGINE!");
+        await _engineService.ResetEngineAsync();
         return Accepted();
     }
 }
