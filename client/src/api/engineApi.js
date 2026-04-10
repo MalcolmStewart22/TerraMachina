@@ -1,5 +1,4 @@
 export async function startWorldGen(parameters){
-    console.log(parameters)
     const response = await fetch('https://localhost:7078/worldgen/start', {
         method: 'POST',
         headers:{
@@ -7,7 +6,6 @@ export async function startWorldGen(parameters){
         },
         body: JSON.stringify(parameters)
         })
-        console.log(response)
     return response
 }
 

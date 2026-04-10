@@ -18,7 +18,9 @@ const WorldSphere = forwardRef((props, ref) =>{
     const updateHandlers = {
         'Starting': handleStarting,
         'Geometry': handleGeometry,
-        'Tectonic': handleTectonic
+        'Tectonic': handleTectonic,
+        'PlateColors' : handlePlateColors,
+        'Reset' : handleReset 
     }
 
     function handleStarting(latestUpdate){
@@ -26,17 +28,33 @@ const WorldSphere = forwardRef((props, ref) =>{
     }
     function handleGeometry(latestUpdate){
         if (latestUpdate?.payload){
-            workerRef.current.postMessage({type: 'geometry', payload: latestUpdate.payload })
+                workerRef.current.postMessage({type: 'geometry', payload: latestUpdate.payload })
         }
-        if(latestUpdate?.stageProgress === 1){
+        else if(latestUpdate.stageProgress === 1){
             workerRef.current.postMessage({type: 'lod', payload: latestUpdate.payload })
         }
     }
 
     function handleTectonic(latestUpdate){
-
+        if (latestUpdate?.payload){
+                workerRef.current.postMessage({type: 'plate', payload: latestUpdate.payload })
+        }
+        else if(latestUpdate.stageProgress === 0)
+            {
+                workerRef.current.postMessage({type: 'prepareTectonic'})
+            }
     }
 
+    function handlePlateColors(latestUpdate){
+        if (latestUpdate?.payload){
+            workerRef.current.postMessage({type: 'plateColors', payload: latestUpdate.payload })
+        }
+    }
+
+    function handleReset(latestUpdate){
+        workerRef.current.postMessage({type: 'reset' })
+
+    }
 
     useEffect(() => {
         const worker = new Worker(

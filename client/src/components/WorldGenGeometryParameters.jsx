@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 
 function WorldGenGeometryParameters({onParametersChange}) {
     const [seed, setSeed] = useState(Math.floor(Math.random() * 900_000) + 100_000);
-    const [subdivisionLevel, setSubdivisionLevel] = useState(6);
+    const [subdivisionLevel, setSubdivisionLevel] = useState(7);
     const [isValid, setIsValid] = useState(true)
 
     const cellCount = 20 * 4 ** subdivisionLevel
@@ -12,7 +12,7 @@ function WorldGenGeometryParameters({onParametersChange}) {
         let newSeed = Math.floor(Math.random() * 900_000) + 100_000
         setIsValid(true)
         setSeed(newSeed)
-        onParametersChange("geometry", {newSeed, subdivisionLevel}, true)
+        onParametersChange("geometry", {seed: newSeed, subdivisionLevel}, true)
     }
 
     function handleSeedChange(e){
@@ -41,12 +41,12 @@ function WorldGenGeometryParameters({onParametersChange}) {
         }
         setIsValid(newValid) 
         setSeed(parsedValue)
-        onParametersChange("geometry", {parsedValue, subdivisionLevel}, newValid)
+        onParametersChange("geometry", {seed: parsedValue, subdivisionLevel}, newValid)
     }
     function handleSubdivisionChange(e){
-        newLevel = parseInt(e.target.value)
+        let newLevel = parseInt(e.target.value)
         setSubdivisionLevel(newLevel)
-        onParametersChange("geometry", {seed, newLevel}, isValid)
+        onParametersChange("geometry", {seed, subdivisionLevel: newLevel}, isValid)
     }
 
 

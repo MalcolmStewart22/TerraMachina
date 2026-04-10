@@ -1,6 +1,6 @@
 import WorldGenGeometryParameters from "./WorldGenGeometryParameters"
 import WorldGenTectonicParameters from "./WorldGenTectonicParameters"
-import { startWorldGen } from "../api/engineApi";
+import { startWorldGen, resetWorldGen } from "../api/engineApi";
 import { useState } from "react";
 
 
@@ -12,7 +12,6 @@ function WorldControls(){
 
     
     async function submitChanges(){
-        console.log(parameters)
         await startWorldGen(parameters)
     }
 
@@ -20,7 +19,9 @@ function WorldControls(){
         setParameters(prev => ({...prev, [phase]: values}))
         setValid(prev => ({...prev, [phase]: isValid}))
     }
-
+    async function reset(){
+        await resetWorldGen()
+    }
     return(
         <div className="h-screen">
             <h1 className="text-3xl font-bold px-10">Input Parameters</h1>
@@ -36,6 +37,7 @@ function WorldControls(){
                     </details>
                 </div>
                 <button className="button-85" role="button" disabled={!isFormValid} onClick={submitChanges}>Generate World</button>
+                <button className="button-85" role="button" onClick={reset}>Reset</button>
             </div>
         </div>
     )
