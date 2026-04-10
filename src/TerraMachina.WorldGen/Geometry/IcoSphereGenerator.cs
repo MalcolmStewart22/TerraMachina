@@ -70,7 +70,7 @@ public class IcoSphereGenerator
             progress.Report(new WorldGenProgressUpdate
             {
                 CurrentStage = WorldGenStageTypes.Geometry,
-                StageProgress = 1f,
+                StageProgress = 1,
                 Payload = new GeometryProgressPayload(cellMap)
             });
         }
@@ -79,7 +79,7 @@ public class IcoSphereGenerator
             progress.Report(new WorldGenProgressUpdate
             {
                 CurrentStage = WorldGenStageTypes.Geometry,
-                StageProgress = 1f,
+                StageProgress = 1,
             });
         }
 
@@ -193,11 +193,12 @@ public class IcoSphereGenerator
                         progress.Report(new WorldGenProgressUpdate
                         {
                             CurrentStage = WorldGenStageTypes.Geometry,
-                            StageProgress = progressCount,
+                            StageProgress = .9f + (progressCount / 320),
                             CurrentStep = WorldGenStepTypes.BuildingCells,
-                            Payload = new GeometryProgressPayload(x)
+                            Payload = new GeometryProgressPayload(x),
+                            Message = $"{progressCount}"
                         });
-                        await Task.Delay(20);
+                        await Task.Delay(30);
                         progressCount++;
                     }
 

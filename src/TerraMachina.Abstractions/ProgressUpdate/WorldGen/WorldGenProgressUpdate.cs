@@ -11,4 +11,5 @@ public class WorldGenProgressUpdate
     public WorldGenStepTypes? CurrentStep { get; set; }
     public float StageProgress { get; set; }
     public IWorldGenPayload? Payload { get; set; }
+    public string? Message { get; set; }
 }

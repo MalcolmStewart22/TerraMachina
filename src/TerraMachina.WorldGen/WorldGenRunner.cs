@@ -36,8 +36,8 @@ public class WorldGenRunner
 
     public async Task RunTectonicsAsync()
     {
-        TectonicGenerator tectonicGen = new();
-        tectonicGen.TectonicPhaseRunner(currentWorld, currentParameters, currentProgress);
+        TectonicGenerator tectonicGen = new(currentParameters, currentProgress);
+        tectonicGen.TectonicPhaseRunner(currentWorld);
     }
 
 }

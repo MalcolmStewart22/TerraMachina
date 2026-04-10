@@ -33,6 +33,7 @@ public class TectonicParameters
     //Base
     public int PlanetRadius { get; set; } 
     public int TectonicSimulationLength { get; set; }
+    public int SeaLevel { get; set; }
     //Mantle Activity
     public int MaxPlumeSize { get; set; }
     public int MinPlumeSize { get; set; }

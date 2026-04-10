@@ -7,14 +7,18 @@ namespace TerraMachina.WorldGen.Tectonics;
 
 public class RidgeSegment
 {
-    public Vector3 StartPoint { get; init; }
-    public Vector3 EndPoint { get; init; }
-    public Vector3 Normal { get; init; }
+    static int NextID = 1;
+    public int SegmentId { get; init; }
+    public Vector3 StartPoint { get; set; }
+    public Vector3 EndPoint { get; set; }
+    public Vector3 Normal { get; set; }
 
     public RidgeSegment(Vector3 startPoint, Vector3 endPoint, Vector3 normal)
     {
         StartPoint = startPoint;
         EndPoint = endPoint;
         Normal = normal;
+        SegmentId = NextID;
+        NextID++;
     }
 }

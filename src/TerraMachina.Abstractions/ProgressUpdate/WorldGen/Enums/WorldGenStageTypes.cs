@@ -11,5 +11,6 @@ public enum WorldGenStageTypes
     Tectonic,
     Circulation,
     Climate,
-    Resources
+    Resources,
+    Reset
 }

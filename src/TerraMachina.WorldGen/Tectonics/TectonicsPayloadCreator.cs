@@ -37,13 +37,13 @@ static class TectonicsPayloadCreator
         result.Plumes = new();
         foreach (MantlePlume plume in plumes)
         {
-            result.Plumes.Add(new PlumePayload(plume.PlumeID, ConvertToTectonicCellMinimums(plume.CellIds, tectonicCellMap)));
+            result.Plumes.Add(new PlumePayload(plume.PlumeID, ConvertToTectonicCellMinimums(plume.CellIds, tectonicCellMap), ConvertToTectonicCellMinimums(plume.CenterCellIds, tectonicCellMap)));
         }
 
         result.Ridges = new();
         foreach (MantleRidge ridge in ridges)
         {
-            result.Ridges.Add(new RidgePayload(ridge.RidgeId, ConvertToTectonicCellMinimums(ridge.ContainedCellIds, tectonicCellMap))); ;
+            result.Ridges.Add(new RidgePayload(ridge.RidgeId, ConvertToTectonicCellMinimums(ridge.ContainedCellIds, tectonicCellMap), ConvertToTectonicCellMinimums(ridge.CenterCellIds, tectonicCellMap))); ;
         }
 
         result.Plates = new();
@@ -65,7 +65,7 @@ static class TectonicsPayloadCreator
         result.Plumes = new();
         foreach (MantlePlume plume in plumes)
         {
-            result.Plumes.Add(new PlumePayload(plume.PlumeID, ConvertToTectonicCellMinimums(plume.CellIds, tectonicCellMap)));
+            result.Plumes.Add(new PlumePayload(plume.PlumeID, ConvertToTectonicCellMinimums(plume.CellIds, tectonicCellMap), ConvertToTectonicCellMinimums(plume.CenterCellIds, tectonicCellMap)));
         }
 
         return result;
@@ -80,7 +80,7 @@ static class TectonicsPayloadCreator
         result.Ridges = new();
         foreach (MantleRidge ridge in ridges)
         {
-            result.Ridges.Add(new RidgePayload(ridge.RidgeId, ConvertToTectonicCellMinimums(ridge.ContainedCellIds, tectonicCellMap))); ;
+            result.Ridges.Add(new RidgePayload(ridge.RidgeId, ConvertToTectonicCellMinimums(ridge.ContainedCellIds, tectonicCellMap), ConvertToTectonicCellMinimums(ridge.CenterCellIds, tectonicCellMap))); ;
         }
 
         return result;
