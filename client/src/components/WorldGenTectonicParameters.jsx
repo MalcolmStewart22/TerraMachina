@@ -18,7 +18,7 @@ function WorldGenTectonicParameters({onParametersChange}){
         ridgeWidth: 1500,
         maxLateralRidgeSway: 1,
         volcanoFrequency: .5,
-        eulerPoleTolerance: .5,
+        eulerPoleTolerance: 50,
         basePlateSpeed: 3
     })
 
@@ -76,7 +76,7 @@ function WorldGenTectonicParameters({onParametersChange}){
             <input name="volcanoFrequency" id="volcanoFrequency" type="range" min="0" max="1" step="0.01" value={tectonicParameters.volcanoFrequency} onChange={onTectonicChange}/>
 
             <label htmlFor="eulerPoleTolerance">Euler Pole Tolerance: {tectonicParameters.eulerPoleTolerance}</label>
-            <input name="eulerPoleTolerance" id="eulerPoleTolerance" type="range" min="0" max="1" step="0.01" value={tectonicParameters.eulerPoleTolerance} onChange={onTectonicChange}/>
+            <input name="eulerPoleTolerance" id="eulerPoleTolerance" type="range" min="20" max="60" step="0.5" value={tectonicParameters.eulerPoleTolerance} onChange={onTectonicChange}/>
 
             <label htmlFor="basePlateSpeed">Base Plate Speed: {tectonicParameters.basePlateSpeed} cm per Year</label>
             <input name="basePlateSpeed" id="basePlateSpeed" type="range" min="1" max="10" step="0.5" value={tectonicParameters.basePlateSpeed} onChange={onTectonicChange}/>

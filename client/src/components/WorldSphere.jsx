@@ -1,5 +1,5 @@
 import { useEffect, useRef, forwardRef, useImperativeHandle  } from "react";
-import {ElementProxy, eventHandlers} from "../workers/ElementProxy";
+import {ElementProxy, eventHandlers} from "../workers/elementProxy";
 
 const WorldSphere = forwardRef((props, ref) =>{
     const canvasRef = useRef(null)

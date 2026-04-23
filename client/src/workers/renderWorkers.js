@@ -168,6 +168,17 @@ function handleTectonicSetup(){
 
 function handlePlateColors(data){
     plateColorMap = data.payload
+    console.log("Received Plate Colors!")
+    console.log(plateColorMap)
+
+    if(pendingBatches.length)
+    {
+        for(const batch of pendingBatches)
+        {
+            handleTectonicPlates(batch)
+        }
+        pendingBatches = []
+    }
 }
 
 function handleTectonicPlates(data){
@@ -178,16 +189,14 @@ function handleTectonicPlates(data){
         console.log("We have plumes!")
         for (const plume of payload.plumes){
             const centerSet = new Set(plume.centerCells.map(c => c.cellID))
-            for (const cell of plume.containedCells)
-            {
+            for (const cell of plume.containedCells){
                 let offset = cellIDs[cell.cellID]
-                mantleCells.add(cell.cellID)
 
                 if(centerSet.has(cell.cellID)){
                     applyColor(plumeCenterColor, offset)
-                    centerCells.add(cell.cellID)
+                    mantleCells.add(cell.cellID)
                 }
-                else if(!centerCells.has(cell.cellID)){
+                else{
                     
                     applyColor(plumeEdgeColor, offset)
                 }
@@ -200,16 +209,14 @@ function handleTectonicPlates(data){
         console.log("We have Ridges!")
         for (const ridge of payload.ridges){
             const centerSet = new Set(ridge.centerCells.map(c => c.cellID))
-            for (const cell of ridge.containedCells)
-            {
+            for (const cell of ridge.containedCells){
                 let offset = cellIDs[cell.cellID]
-                mantleCells.add(cell.cellID)
 
                 if(centerSet.has(cell.cellID)){
                     applyColor(plumeCenterColor, offset)
-                    centerCells.add(cell.cellID)
+                    mantleCells.add(cell.cellID)
                 }
-                else if(!centerCells.has(cell.cellID)){
+                else{
                     
                     applyColor(plumeEdgeColor, offset)
                 }          
@@ -217,20 +224,25 @@ function handleTectonicPlates(data){
         }
         updateNeeded = true
     }
-    if(payload.tectonicCells)
-    {
-        console.log("We have Cells!")
-        for (const cell of payload.tectonicCells)
-        {
-            if(mantleCells.has(cell.cellID)) continue
+    if(plateColorMap){
+        if(payload.tectonicCells){
+            console.log("We have Cells!")
+            for (const cell of payload.tectonicCells){
+                if(mantleCells.has(cell.cellID)) continue
 
-            let offset = cellIDs[cell.cellID]
-            let color = plateColorMap[cell.plateID]
+                let offset = cellIDs[cell.cellID]
+                let color = plateColorMap[cell.plateID]
 
-            applyColor(color, offset)
-            
+                console.log(color)
+                console.log(offset)
+                applyColor(color, offset)
+                
+            }
+            updateNeeded = true
         }
-        updateNeeded = true
+    }
+    else{
+        pendingBatches.push(data)
     }
     colorAttribute.needsUpdate = updateNeeded
 }

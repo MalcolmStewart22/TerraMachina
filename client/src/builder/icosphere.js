@@ -4,7 +4,7 @@ import { createSpatialNode } from "./world";
 import { createCellGeometry } from "./world";
 import { createCell } from "./world";
 
-const goldRatio = (1 + Math.sqrt(5)) / 2
+const GOLD_RATIO = (1 + Math.sqrt(5)) / 2
 
 export function generateSphere(){
     const cellMap = createCellMap()
@@ -29,20 +29,20 @@ export function generateSphere(){
     {
         //create vertices
         // XY Plane
-        vertices.push(new Vector3(-1, goldRatio, 0))
-        vertices.push(new Vector3(1, goldRatio, 0))
-        vertices.push(new Vector3(-1, -goldRatio, 0))
-        vertices.push(new Vector3(1, -goldRatio, 0))
+        vertices.push(new Vector3(-1, GOLD_RATIO, 0))
+        vertices.push(new Vector3(1, GOLD_RATIO, 0))
+        vertices.push(new Vector3(-1, -GOLD_RATIO, 0))
+        vertices.push(new Vector3(1, -GOLD_RATIO, 0))
         // YZ Plane
-        vertices.push(new Vector3(0, -1, goldRatio))
-        vertices.push(new Vector3(0, 1, goldRatio))
-        vertices.push(new Vector3(0, -1, -goldRatio))
-        vertices.push(new Vector3(0, 1, -goldRatio))
+        vertices.push(new Vector3(0, -1, GOLD_RATIO))
+        vertices.push(new Vector3(0, 1, GOLD_RATIO))
+        vertices.push(new Vector3(0, -1, -GOLD_RATIO))
+        vertices.push(new Vector3(0, 1, -GOLD_RATIO))
         // XZ Plane
-        vertices.push(new Vector3(goldRatio, 0, -1))
-        vertices.push(new Vector3(goldRatio, 0, 1))
-        vertices.push(new Vector3(-goldRatio, 0, -1))
-        vertices.push(new Vector3(-goldRatio, 0, 1))  
+        vertices.push(new Vector3(GOLD_RATIO, 0, -1))
+        vertices.push(new Vector3(GOLD_RATIO, 0, 1))
+        vertices.push(new Vector3(-GOLD_RATIO, 0, -1))
+        vertices.push(new Vector3(-GOLD_RATIO, 0, 1))  
         
 
         //create Triangles

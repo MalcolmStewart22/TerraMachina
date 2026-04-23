@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 function WorldView(){
     const sphereRef = useRef(null)
     const latestUpdate = useEngineHub()
-    const currentColorIndex = useState(0)
+    const currentColorIndex = useRef(0)
     const plateColorOptions = [
         [0.263, 0.388, 0.847], // blue
         [0.235, 0.706, 0.294], // green
@@ -38,29 +38,33 @@ function WorldView(){
         [0.000, 0.122, 0.247], // midnight
         [0.420, 0.557, 0.137], // olive drab
     ]
-    const plateColorMap = useState({})
-    const plateNameMap = useState({})
+    const plateColorMap = useRef(new Map())
+    const plateNameMap = useRef(new Map())
+    const assignedColors = useRef(false)
 
     useEffect(() => {
         if (!latestUpdate || !sphereRef.current) return
-        //console.log(latestUpdate)
+        console.log(latestUpdate)
 
-        if(latestUpdate.currentstep == 'FillingInitialPlates')
+        if(latestUpdate.currentStep == 'FillingInitialPlates' && !assignedColors.current)
         {
+            console.log("We got plates!")
+            assignedColors.current = true
             const plates = latestUpdate.payload.plates
             Object.entries(plates).forEach(([plateId, plateName]) => {
 
-                if(!plateColorMap[plateId]){
-                    plateColorMap.set(parseint(plateId), plateColorOptions[currentColorIndex])
+                if(!plateColorMap.current.has(parseInt(plateId))){
+                    plateColorMap.current.set(parseInt(plateId), plateColorOptions[currentColorIndex.current])
+                    currentColorIndex.current++
                 }
-                if(!plateNameMap[plateId]){
-                    plateNameMap.set(parseint(plateId), plateName)
+                if(!plateNameMap.current.has(parseInt(plateId))){
+                    plateNameMap.current.set(parseInt(plateId), plateName)
                 }
             })
             
             sphereRef.current.newUpdate({
                 currentStage: 'PlateColors',
-                payload: plateColorMap
+                payload: Object.fromEntries(plateColorMap.current)
             })
         }
         sphereRef.current.newUpdate(latestUpdate)
