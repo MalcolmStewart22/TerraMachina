@@ -1,0 +1,51 @@
+export function createCellGeometry(cellId, position, vertices) {
+  return {
+    cellId,
+    position,
+    vertices,
+    neighborsById: [0, 0, 0]
+  }
+}
+
+export function createCell(geometry) {
+  return {
+    geometry,
+    isOcean: true,
+    biome: null,
+    //Resources
+    faunaResources: null,
+    floraResources: null,
+    //Geology Data
+    elevation: 0,
+    soil: null,
+    currentFertility: 0,
+    bedrock: null,
+    //Hydrology Data
+    riverId: null,
+    lakeId: null,
+    soilWaterContent: 0,
+    standingWater: 0,
+    snowPack: 0,
+    isWetland: false,
+    isCoastland: false,
+    //Atmosphere Data
+    temperature: 0,
+    humidity: 0
+  }
+}
+
+export function createCellMap() {
+  return {
+    cells: [],
+    cellById: new Map(),
+    worldTree: []
+  }
+}
+
+export function createSpatialNode(){
+    return {
+        nodeId: 0,
+        vertices: [],
+        children: []
+    }
+}
