@@ -1,4 +1,16 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Spectral+SC:wght@200&display=swap');
 @import "tailwindcss";
+
+
+@theme {
+  --color-base: #0A0F0D;
+  --color-elevated: #141D16;
+  --color-ink: #E8ECE9;
+  --color-muted: #8E988F;
+  --color-accent: #47614A;
+  --font-custom: "Inter";
+  --font-title: "Spectral SC", "Inter";
+}
 
 input {
     border-width: 2px;

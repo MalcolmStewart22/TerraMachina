@@ -1,20 +1,19 @@
-import WorldControls from "./components/WorldControls"
-import WorldView from "./components/WorldView"
-
+import { Routes, Route } from "react-router-dom"
+import Landing from "./pages/Landing"
+import WorldBuilder from "./pages/WorldBuilder"
+import WorldSim from "./pages/WorldSim"
+import WorldGen from "./pages/WorldGen"
 
 
 function App() {
   return (
-    <div>
-      <h1 className="text-5xl font-bold p-4">TerraMachina</h1>
-      <div className="flex flex-row gap-4 p-4 h-screen">
-        <div className="w-96">
-          <WorldControls/>
-        </div>
-        <div className="flex-1">
-          <WorldView/>
-        </div>
-      </div>
+    <div className="bg-base">
+      <Routes>
+        <Route path="/" element={<Landing />} />
+        <Route path="/build" element={<WorldBuilder />} />
+        <Route path="/sim" element={<WorldSim />} />
+        <Route path="/gen" element={<WorldGen />} />
+      </Routes>
     </div>
   )
 }
