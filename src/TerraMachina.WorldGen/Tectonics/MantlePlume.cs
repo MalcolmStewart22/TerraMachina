@@ -7,6 +7,7 @@ namespace TerraMachina.WorldGen.Tectonics;
 
 public class MantlePlume
 {
+    static int NextID = 1;
     public int PlumeID {  get; init; }
     public Vector3 Center { get; init; }
     public List<int> CellIds { get; init; } = new();
@@ -15,9 +16,10 @@ public class MantlePlume
     public int RadiusKm { get; init; }
 
     //seed plumes
-    public MantlePlume(int id, Vector3 center, int size)
+    public MantlePlume(Vector3 center, int size)
     {
-        PlumeID = id;
+        PlumeID = NextID;
+        NextID++;
         Center = center;
         Age = 0;
         RadiusKm = size;

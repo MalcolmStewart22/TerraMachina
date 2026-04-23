@@ -39,14 +39,13 @@ public class TectonicGenerator
     private Dictionary<int, MantleRidge> RidgeMap { get; init; } = new();
     private List<MantleRidge> Ridges { get; init; } = new();
     private List<TectonicPlate> Plates { get; init; } = new();
+    private Dictionary<int, TectonicPlate> PlateMap = new();
 
     private IProgress<WorldGenProgressUpdate> currentProgress;
     private WorldGenParameters currentParameters;
-    private int nextPlumeId;
-    private int nextRidgeId;
-    private int nextPlateId;
     private float normalizedRidgeWidth;
     private Random rng;
+    private Queue<TectonicCell> expansionFrontier = new();
 
     public void TectonicPhaseRunner(World world)
     {
@@ -61,11 +60,15 @@ public class TectonicGenerator
         Console.WriteLine("WORLDGEN: Finished Tectonic CellMap!");
         try
         {
-        GenerateStartingRidges(
-            currentParameters.TectonicParameters.TotalSeedPlumes,
-            currentParameters.TectonicParameters.MaxLateralRidgeSway,
-            currentParameters.TectonicParameters.PlumeCenterSize
-            );
+            GenerateStartingRidges(
+                currentParameters.TectonicParameters.TotalSeedPlumes,
+                currentParameters.TectonicParameters.MaxLateralRidgeSway,
+                currentParameters.TectonicParameters.PlumeCenterSize
+                );
+
+            GeneratePlates();
+            InitializeExpansionFrontier();
+            while (ExpandPlates()) { }
         } catch (Exception e)
         {
             Console.WriteLine($"Exception: {e.Message}");
@@ -81,10 +84,6 @@ public class TectonicGenerator
         Ridges.Clear();
         Plates.Clear();
         PlumeMap.Clear();
-
-        nextPlumeId = 0;
-        nextRidgeId = 0;
-        nextPlateId = 0;
 
         //Ridge Width is input by users as the full span requiring use of planet diameter to give correct values
         normalizedRidgeWidth = (float)parameters.TectonicParameters.RidgeWidth / (2f * parameters.TectonicParameters.PlanetRadius);
@@ -115,7 +114,7 @@ public class TectonicGenerator
         float minDotProduct = MathF.Cos((currentParameters.TectonicParameters.MaxPlumeSize * currentParameters.TectonicParameters.PlumeConnectivityDistance) / currentParameters.TectonicParameters.PlanetRadius);
         float maxDotProduct = MathF.Cos((currentParameters.TectonicParameters.MinPlumeSize * currentParameters.TectonicParameters.PlumeConnectivityDistance) / currentParameters.TectonicParameters.PlanetRadius);
 
-        int cellIndex = rng.Next(0, Cells.Count());
+        int cellIndex = rng.Next(0, Cells.Count);
 
         MantlePlume newPlume = GeneratePlume(currentParameters.TectonicParameters.RidgeWidth, Cells[cellIndex].Geometry.Position);
         seedPlumes.Add(newPlume);
@@ -152,7 +151,7 @@ public class TectonicGenerator
             }
             if (approvedOptions.Count > 0)
             {
-                cellIndex = rng.Next(0, approvedOptions.Count());
+                cellIndex = rng.Next(0, approvedOptions.Count);
 
                 newPlume = GeneratePlume(currentParameters.TectonicParameters.RidgeWidth, approvedOptions[cellIndex].Geometry.Position);
                 
@@ -219,7 +218,7 @@ public class TectonicGenerator
             if (approvedOptions.Count > 0)
             {
 
-                cellIndex = rng.Next(0, approvedOptions.Count());
+                cellIndex = rng.Next(0, approvedOptions.Count);
 
                 newPlume = GeneratePlume(currentParameters.TectonicParameters.RidgeWidth, approvedOptions[cellIndex].cell.Geometry.Position);
 
@@ -239,18 +238,18 @@ public class TectonicGenerator
             StageProgress = 0,
             CurrentStep = WorldGenStepTypes.GeneratingSeedPlumes,
             Payload = TectonicsPayloadCreator.CreateTectonicPayload(RidgePlumes, TectonicCellMap),
-            Message = $"Requested Seed Plumes: {currentParameters.TectonicParameters.TotalSeedPlumes} Created Seed Plumes: {seedPlumes.Count()}"
+            Message = $"Requested Seed Plumes: {currentParameters.TectonicParameters.TotalSeedPlumes} Created Seed Plumes: {seedPlumes.Count}"
         });
         Console.WriteLine("WORLDGEN: Finished Creating seed plumes!");
 
-        Console.WriteLine("==== PLUME DATA ====");
-        foreach (var plume in RidgePlumes)
-        {
-            Console.WriteLine($"Plume ID: {plume.PlumeID} CenterCellID: {plume.CenterCellIds[0]}");
-        }
+        //Console.WriteLine("==== PLUME DATA ====");
+        //foreach (var plume in RidgePlumes)
+        //{
+        //    Console.WriteLine($"Plume ID: {plume.PlumeID} CenterCellID: {plume.CenterCellIds[0]}");
+        //}
         #endregion
 
-        Console.WriteLine("==== RIDGE DATA ====");
+        //Console.WriteLine("==== RIDGE DATA ====");
         foreach (KeyValuePair<MantlePlume, MantlePlume> entry in ridgePairs)
         {
             Ridges.Add(GenerateRidge(entry.Key, entry.Value, maxLateralRidgeSway));
@@ -258,9 +257,9 @@ public class TectonicGenerator
 
         FindCellsInRidges(plumeCenterSize, Ridges);
 
-        
+
         int ridgeCells = 0;
-        foreach(var ridge in Ridges)
+        foreach (var ridge in Ridges)
         {
             Console.WriteLine($"Ridge: {ridge.RidgeId} Lateral: {ridge.LateralAngle} Normal: {ridge.Normal} \n" +
                 $"Start Plume: ID: {ridge.PlumeAId} Position: {PlumeMap[ridge.PlumeAId].Center} End Plume:  ID: {ridge.PlumeBId} Position: {PlumeMap[ridge.PlumeBId].Center}");
@@ -269,10 +268,10 @@ public class TectonicGenerator
             {
                 Console.WriteLine($"START: {seg.StartPoint} END: {seg.EndPoint} NORMAL: {seg.Normal} DISTANCE: {Vector3.Distance(seg.StartPoint, seg.EndPoint)}");
             }
-            ridgeCells += ridge.ContainedCellIds.Count();
+            ridgeCells += ridge.ContainedCellIds.Count;
         }
-        
-        Console.WriteLine($"Total Cells: {Cells.Count()} Ridge Cells: {ridgeCells}");
+
+        Console.WriteLine($"Total Cells: {Cells.Count} Ridge Cells: {ridgeCells}");
 
 
         //UPDATE!
@@ -288,8 +287,7 @@ public class TectonicGenerator
     }
     private MantlePlume GeneratePlume(int size, Vector3 center)
     {
-        MantlePlume newPlume = new MantlePlume(nextPlumeId, center, size);
-        nextPlumeId++;
+        MantlePlume newPlume = new MantlePlume(center, size);
         
         float plumeRadius = size / (2f * currentParameters.TectonicParameters.PlanetRadius);
 
@@ -303,6 +301,8 @@ public class TectonicGenerator
                 {
                     newPlume.CenterCellIds.Add(cell.Geometry.CellId);
                 }
+                (Vector3 direction, float magnitude) force = CalculateForce(cell.Geometry.Position, center, angularDistance, plumeRadius);
+                AccumulateForce(cell, force.direction, force.magnitude);
             }
         }
 
@@ -333,11 +333,11 @@ public class TectonicGenerator
         List<RidgeSegment> segments = new();
         Dictionary<(Vector3, Vector3), Vector3> cachedMidpoints = new();
 
-        for (int i = 0; i < points.Count(); i++)
+        for (int i = 0; i < points.Count; i++)
         {
             Vector3 startPoint;
             Vector3 endPoint;
-            if (i < points.Count() - 1)
+            if (i < points.Count - 1)
             {
                 if (i == 0)
                 {
@@ -386,9 +386,9 @@ public class TectonicGenerator
         //move all the other segments into a staircase up to the furthest point and back down
         float inwardLateralStep = lateralAngle / index;
         float currentLateralDisplacement = inwardLateralStep;
-        float outwardLateralStep = lateralAngle / (points.Count() - (index +1));
+        float outwardLateralStep = lateralAngle / (points.Count - (index +1));
 
-        for (int i = 1; i < segments.Count() - 1; i++)
+        for (int i = 1; i < segments.Count - 1; i++)
         {
             if (i < index)
             {
@@ -412,8 +412,7 @@ public class TectonicGenerator
         //rough up the eveness of the segment steps to produce a more natural result - possibly...
 
 
-        MantleRidge newRidge = new MantleRidge(nextRidgeId, plumeA.PlumeID, plumeB.PlumeID, lateralAngle, normalVector, segments);
-        nextRidgeId++;
+        MantleRidge newRidge = new MantleRidge(plumeA.PlumeID, plumeB.PlumeID, lateralAngle, normalVector, segments);
 
         RidgeMap.Add(newRidge.RidgeId, newRidge);
 
@@ -479,6 +478,8 @@ public class TectonicGenerator
                         }
 
                         ridge.ContainedCellIds.Add(cell.Geometry.CellId);
+                        (Vector3 direction, float magnitude) force = CalculateForce(cell.Geometry.Position, bestSegment.StartPoint, bestSegment.EndPoint, bestDistance);
+                        AccumulateForce(cell, force.direction, force.magnitude);
                         break;//can only be in one ridge
                     }
                 }
@@ -486,13 +487,258 @@ public class TectonicGenerator
         }//cell loop
     }
 
+    private void AccumulateForce(TectonicCell cell, Vector3 direction, float magnitude)
+    {
+        if(cell.CurrentDirection != Vector3.Zero)
+        {
+            Vector3 combined = (cell.CurrentDirection * cell.Speed) + (direction * magnitude);
+            cell.CurrentDirection = Vector3.Normalize(combined);
+            cell.Speed = combined.Length();
+        }
+        else
+        {
+            cell.CurrentDirection = direction;
+            cell.Speed = magnitude;
+        }
+    }
+
+    private (Vector3, float) CalculateForce(Vector3 cellPosition, Vector3 centerOfPlume, float angularDistance, float plumeMax)
+    {
+        //direction
+        Vector3 chord = cellPosition - centerOfPlume;
+        Vector3 tangent = chord - Vector3.Dot(chord, cellPosition) * cellPosition;
+        Vector3 direction = Vector3.Normalize(tangent);
+
+        //magnitude
+        float forcePercent = MathF.Cos(angularDistance / plumeMax);
+        float plumeForceAtCell = (currentParameters.TectonicParameters.PlumeBaseStrength + 2) * forcePercent; //plumes and ridges should always be faster than base
+        float magnitude = plumeForceAtCell * currentParameters.TectonicParameters.BasePlateSpeed;
+
+        return (direction, magnitude);
+    }
+
+    private (Vector3, float) CalculateForce(Vector3 cellPosition, Vector3 startPoint, Vector3 endPoint, float distance)
+    {
+        //direction
+        Vector3 normal = Vector3.Normalize(Vector3.Cross(startPoint, endPoint));
+        Vector3 projected = Vector3.Normalize(cellPosition - (Vector3.Dot(cellPosition, normal) * normal));
+
+        Vector3 chord = cellPosition - projected;
+        Vector3 tangent = chord - Vector3.Dot(chord, cellPosition) * cellPosition;
+        Vector3 direction = Vector3.Normalize(tangent);
+
+        //magnitude
+        float forcePercent = MathF.Cos(distance / normalizedRidgeWidth);
+        float plumeForceAtCell = (currentParameters.TectonicParameters.PlumeBaseStrength + 2) * forcePercent; //plumes and ridges should always be faster than base
+        float magnitude = plumeForceAtCell * currentParameters.TectonicParameters.BasePlateSpeed;
+
+        return (direction, magnitude);
+    }
+
     private void GeneratePlates()
     {
+        Console.WriteLine("Generating Starting Plates!");
+        List<TectonicCell> startingCells = new();
 
+        foreach(var plume in RidgePlumes)
+        {
+            foreach(var cellId in plume.CellIds)
+            {
+                startingCells.Add(TectonicCellMap[cellId]);
+            }
+        }
+        foreach (var ridge in Ridges)
+        {
+            foreach (var cellId in ridge.ContainedCellIds)
+            {
+                startingCells.Add(TectonicCellMap[cellId]);
+            }
+        }
+
+        HashSet<TectonicCell> visitedCells = new();
+
+        float toleranceRadians = currentParameters.TectonicParameters.EulerPoleTolerance * (MathF.PI / 180f);
+        float tolerance = MathF.Cos(toleranceRadians);
+
+        foreach (var cell in startingCells)
+        {
+            if(visitedCells.Contains(cell)) continue;
+            Queue<TectonicCell> cellsToCheck = new();
+            HashSet<TectonicCell> addedToQueue = new();
+
+            foreach (var cellid in cell.Geometry.NeighborsById)
+            {
+                if(TectonicCellMap[cellid].CurrentDirection != Vector3.Zero && !visitedCells.Contains(TectonicCellMap[cellid]) && !addedToQueue.Contains(TectonicCellMap[cellid]))
+                {
+                    cellsToCheck.Enqueue(TectonicCellMap[cellid]);
+                    addedToQueue.Add(TectonicCellMap[cellid]);
+                }
+            }
+
+            //If all neighbors are either not ready to be part of a plate or are already part of a plate
+            if(cellsToCheck.Count <= 0)
+            {
+                float smallestDeviation = float.MaxValue;
+                TectonicPlate? bestMatch = null;
+
+                foreach (var cellid in cell.Geometry.NeighborsById)
+                {
+                    if(TectonicCellMap[cellid].PlateId != null)
+                    {
+                        TectonicPlate currrentPlate = PlateMap[TectonicCellMap[cellid].PlateId.Value];
+
+                        Vector3 desiredPole = Vector3.Normalize(Vector3.Cross(TectonicCellMap[cellid].Geometry.Position, TectonicCellMap[cellid].CurrentDirection));
+                        float deviation = MathF.Abs(Vector3.Dot(currrentPlate.EulerPolePosition, desiredPole));
+
+                        if(deviation < smallestDeviation)
+                        {
+                            smallestDeviation = deviation;
+                            bestMatch = currrentPlate;
+                        }
+                    }
+                }
+                if (bestMatch == null) continue;
+                bestMatch.ContainedCellIds.Add(cell.Geometry.CellId);
+                cell.PlateId = bestMatch.PlateID;
+
+                continue;
+            }
+
+            Vector3 baseEulerPole = Vector3.Normalize(Vector3.Cross(cell.Geometry.Position, cell.CurrentDirection));
+
+            List<TectonicCell> currentPlate = new();
+            currentPlate.Add(cell);
+
+            visitedCells.Add(cell);
+
+
+            while (cellsToCheck.Count > 0)
+            {
+                TectonicCell current = cellsToCheck.Dequeue();
+
+                Vector3 desiredPole = Vector3.Normalize(Vector3.Cross(current.Geometry.Position, current.CurrentDirection));
+                float deviation = Vector3.Dot(baseEulerPole, desiredPole);
+
+                if(deviation >= tolerance)
+                {
+                    visitedCells.Add(current);
+                    currentPlate.Add(current);
+
+                    foreach (var cellid in current.Geometry.NeighborsById)
+                    {
+                        if (TectonicCellMap[cellid].CurrentDirection != Vector3.Zero && !visitedCells.Contains(TectonicCellMap[cellid]) && !addedToQueue.Contains(TectonicCellMap[cellid]))
+                        {
+                            cellsToCheck.Enqueue(TectonicCellMap[cellid]);
+                            addedToQueue.Add(TectonicCellMap[cellid]);
+                        }
+                    }
+                }
+            }//while block
+
+            Vector3 accumulatedPoles = Vector3.Zero;
+
+            foreach(var usedCell in currentPlate)
+            {
+                accumulatedPoles += Vector3.Cross(usedCell.Geometry.Position, usedCell.CurrentDirection);
+            }
+            Vector3 plateEulerPole = Vector3.Normalize(accumulatedPoles);
+
+            Vector3 directionFromPole = Vector3.Normalize(Vector3.Cross(plateEulerPole, cell.Geometry.Position));
+            float agreement = Vector3.Dot(directionFromPole, cell.CurrentDirection);
+            if (agreement < 0) plateEulerPole = -plateEulerPole;
+
+            TectonicPlate newPlate = new TectonicPlate(TectonicPlateNameGenerator.GenerateTectonicPlateName(rng), currentPlate, plateEulerPole);
+
+            Plates.Add(newPlate);
+            PlateMap.Add(newPlate.PlateID, newPlate);
+            Console.WriteLine("Plate Generated!" + newPlate.Name);
+        }// cell loop
+
+        // UPDATE!
+        currentProgress.Report(new WorldGenProgressUpdate
+        {
+            CurrentStage = WorldGenStageTypes.Tectonic,
+            StageProgress = 0,
+            CurrentStep = WorldGenStepTypes.FillingInitialPlates,
+            Payload = TectonicsPayloadCreator.CreateTectonicPayload(Plates, startingCells),
+        });
+
+        Console.WriteLine("Initial Plates Created! Number: " + Plates.Count);
+    }
+    private void InitializeExpansionFrontier()
+    {
+        foreach (var plate in Plates)
+        {
+            foreach (var cellId in plate.ContainedCellIds)
+            {
+                expansionFrontier.Enqueue(TectonicCellMap[cellId]);
+            }
+        }
+    }
+
+    private bool ExpandPlates()
+    {
+        Console.WriteLine($"Current Frontier: {expansionFrontier.Count}");
+        if (expansionFrontier.Count == 0) return false;
+
+        Queue<TectonicCell> nextFrontier = new();
+
+        while (expansionFrontier.Count > 0)
+        {
+            TectonicCell current = expansionFrontier.Dequeue();
+            TectonicPlate currentPlate = PlateMap[current.PlateId.Value];
+
+            TectonicCell? bestNeighbor = null;
+            float bestDot = float.MinValue;
+
+            foreach (var neighborId in current.Geometry.NeighborsById)
+            {
+                TectonicCell neighbor = TectonicCellMap[neighborId];
+                if (neighbor.PlateId != null) continue;
+
+                Vector3 toNeighbor = neighbor.Geometry.Position - current.Geometry.Position;
+                float dot = Vector3.Dot(toNeighbor, current.CurrentDirection);
+
+                if (dot > bestDot)
+                {
+                    bestDot = dot;
+                    bestNeighbor = neighbor;
+                }
+
+                if (dot > 0)
+                {
+                    nextFrontier.Enqueue(current); // re-enqueue current so it keeps trying next tick
+                }
+            }
+
+            if (bestNeighbor == null) continue;
+
+            bestNeighbor.PlateId = currentPlate.PlateID;
+            currentPlate.ContainedCellIds.Add(bestNeighbor.Geometry.CellId);
+
+            Vector3 direction = Vector3.Normalize(Vector3.Cross(currentPlate.EulerPolePosition, bestNeighbor.Geometry.Position));
+            AccumulateForce(bestNeighbor, direction, currentParameters.TectonicParameters.BasePlateSpeed);
+
+            nextFrontier.Enqueue(bestNeighbor);
+        }
+
+        expansionFrontier = nextFrontier;
+
+        Console.WriteLine($"Next Frontier: {expansionFrontier.Count}");
+
+        // UPDATE!
+        currentProgress.Report(new WorldGenProgressUpdate
+        {
+            CurrentStage = WorldGenStageTypes.Tectonic,
+            StageProgress = 0,
+            CurrentStep = WorldGenStepTypes.FillingInitialPlates,
+            Payload = TectonicsPayloadCreator.CreateTectonicPayload(new List<TectonicCell>(nextFrontier)),
+        });
+        Console.WriteLine("Plate Filling...");
+        return expansionFrontier.Count > 0;
     }
     private void SimulateTectonicActivity()
     {
 
     }
-
 }

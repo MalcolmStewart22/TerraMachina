@@ -193,7 +193,7 @@ public class IcoSphereGenerator
                         progress.Report(new WorldGenProgressUpdate
                         {
                             CurrentStage = WorldGenStageTypes.Geometry,
-                            StageProgress = .9f + (progressCount / 320),
+                            StageProgress = (progressCount / 320f),
                             CurrentStep = WorldGenStepTypes.BuildingCells,
                             Payload = new GeometryProgressPayload(x),
                             Message = $"{progressCount}"

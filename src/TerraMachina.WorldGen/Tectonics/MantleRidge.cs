@@ -18,6 +18,7 @@ namespace TerraMachina.WorldGen.Tectonics;
 /// </summary>
 public class MantleRidge
 {
+    static int NextID = 1;
     public int RidgeId { get; init; }
     public int PlumeAId { get; init; }
     public int PlumeBId { get; init; }
@@ -27,9 +28,10 @@ public class MantleRidge
     public List<int> CenterCellIds { get; init; } = new();
     public List<int> ContainedCellIds { get; init; } = new();
 
-    public MantleRidge(int id, int plumeAID, int plumeBID, float lateralAngle, Vector3 normal, List<RidgeSegment> segments)
+    public MantleRidge(int plumeAID, int plumeBID, float lateralAngle, Vector3 normal, List<RidgeSegment> segments)
     {
-        RidgeId = id;
+        RidgeId = NextID;
+        NextID++;
         PlumeAId = plumeAID;
         PlumeBId = plumeBID;
         LateralAngle = lateralAngle;
