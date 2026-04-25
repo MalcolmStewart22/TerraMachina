@@ -6,9 +6,6 @@ import MapCanvas from "../components/builder/MapCanvas"
 import ToolPanel from "../components/builder/ToolPanel"
 
 
-const EDITABLE_LATITUDE = 55 * Math.PI / 180 
-const EDITABLE_LONGITUDE = (180 - 10) * Math.PI / 180
-
 function WorldBuilder() {
   const [cellMap, setCellMap] = useState(null)
   const [geometry, setGeometry] = useState(null)
@@ -24,25 +21,23 @@ function WorldBuilder() {
     setGeometry(geo)
   }, [])
 
-  const handleCellClick = (cellId) =>{
-    const cell = cellMap.cellById.get(cellId)
-    const position = cell.geometry.position
-    
-    const latitude = Math.asin(position.y)
-    if (Math.abs(latitude) > EDITABLE_LATITUDE) return
-    
-    const longitude = Math.atan2(position.z, position.x)
-    if (Math.abs(longitude) > EDITABLE_LONGITUDE) return
 
-    console.log("Clicked Cell: ", cellId, "Latitude: ", latitude)
-  }
     if (!cellMap) return <div>Generating world...</div>
 
   return(
     <div className="bg-base text-ink min-h-screen flex flex-col">
       <HeaderLinks/>
       <div className=" flex-col flex-1 relative">
-        <MapCanvas geometry={geometry} cellMap={cellMap} onCellClick={handleCellClick}/>
+        <MapCanvas 
+          geometry={geometry} 
+          cellMap={cellMap} 
+          activeBrush={activeBrush}
+          activeTool={activeTool}
+          brushSize={brushSize}
+          brushPower={brushPower}
+          seaLevel={5000}
+
+        />
         <ToolPanel 
           activeBrush={activeBrush}
           setActiveBrush={setActiveBrush}

@@ -1,16 +1,28 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
+import { computeCellColor, applyElevationChange, getCellsInRadius, isCellEditable } from '../../builder/painting'
 
-const raycaster = new THREE.Raycaster()
-const mouse = new THREE.Vector2()
+const RAYCASTER = new THREE.Raycaster()
+const MOUSE = new THREE.Vector2()
+const CELL_SIZE_APPROX = 0.018
 
-function MapCanvas({ geometry, cellMap, onCellClick }) {
+function MapCanvas({ geometry, cellMap, activeTool, brushPower, brushSize, seaLevel }) {
+    const activeToolRef = useRef(activeTool)
+    const brushPowerRef = useRef(brushPower)
+    const brushSizeRef = useRef(brushSize)
+    const seaLevelRef = useRef(seaLevel)
+
     const canvasRef = useRef(null)
     const cameraRef = useRef(null)
     const sceneRef = useRef(null)
     const rendererRef = useRef(null)
     const meshRef = useRef(null)
-    
+
+    const isMouseDownRef = useRef(false)
+    const hoveredCellRef = useRef(null)
+    const tickIntervalRef = useRef(null)
+    const cursorRingRef = useRef(null)
+    const alignTargetRef = useRef(null)
 
     const buildFrame = () => {
         if (sceneRef.current.children.some(c => c.userData.isFrame)) return
@@ -85,23 +97,124 @@ function MapCanvas({ geometry, cellMap, onCellClick }) {
         cameraRef.current.bottom = -halfHeight
         cameraRef.current.updateProjectionMatrix()
     }
-    const handleClick = (event) => {
-        const rect = canvasRef.current.getBoundingClientRect()
-        
-        // Convert pixel coords to NDC
-        mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1
-        mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1
-        
-        raycaster.setFromCamera(mouse, cameraRef.current)
-        const intersects = raycaster.intersectObject(meshRef.current)
-        
-        if (intersects.length === 0) return
-        
-        const faceIndex = intersects[0].faceIndex
-        const cellId = geometry.faceIndexToCellId[faceIndex]
-        
-        onCellClick(cellId)
+    const buildRingCursor = () =>{
+        const ringGeometry = new THREE.RingGeometry(0.95, 1.0, 32)  // inner, outer, segments
+        const ringMaterial = new THREE.MeshBasicMaterial({ 
+            color: 0xffffff, 
+            side: THREE.DoubleSide,
+            transparent: true,
+            opacity: 0.7
+        })
+        const cursorRing = new THREE.Mesh(ringGeometry, ringMaterial)
+        cursorRing.position.z = 0.05
+        cursorRing.visible = false
+        sceneRef.current.add(cursorRing)
+        cursorRingRef.current = cursorRing
+        const radius = brushSize * CELL_SIZE_APPROX
+        cursorRingRef.current.scale.set(radius, radius, 1)
     }
+
+   //#region Painting
+    const updateCellColor = (cellId, elevation) => {
+        const offset = geometry.cellIdsToOffset.get(cellId)
+        if (offset == null) return
+        
+        const color = computeCellColor(elevation, seaLevelRef.current)
+        const colorAttr = meshRef.current.geometry.attributes.color
+        
+        // each cell is 3 vertices, write same color to all 3
+        for (let i = 0; i < 3; i++) {
+            const vertexOffset = offset + i * 3
+            colorAttr.array[vertexOffset]     = color[0]
+            colorAttr.array[vertexOffset + 1] = color[1]
+            colorAttr.array[vertexOffset + 2] = color[2]
+        }
+        
+        colorAttr.needsUpdate = true
+    }
+    const updateHoveredCell = (event) => {
+        const rect = canvasRef.current.getBoundingClientRect()
+        MOUSE.x = ((event.clientX - rect.left) / rect.width) * 2 - 1
+        MOUSE.y = -((event.clientY - rect.top) / rect.height) * 2 + 1
+        
+        RAYCASTER.setFromCamera(MOUSE, cameraRef.current)
+        const intersects = RAYCASTER.intersectObject(meshRef.current)
+        
+        const overMap = intersects.length > 0
+        const toolActive = activeToolRef.current !== null
+        
+        // Cursor visibility — always runs
+        const desiredCursor = (overMap && toolActive) ? 'none' : 'default'
+        if (canvasRef.current.style.cursor !== desiredCursor) {
+            canvasRef.current.style.cursor = desiredCursor
+        }
+        
+        // Ring visibility based on overMap (independent of activeTool, since activeTool already controls visibility globally)
+        if (cursorRingRef.current) {
+            cursorRingRef.current.visible = overMap && toolActive
+        }
+        
+        if (!overMap) {
+            hoveredCellRef.current = null
+            return
+        }
+        
+        // We're over the map — update hovered cell and ring position
+        hoveredCellRef.current = geometry.faceIndexToCellId[intersects[0].faceIndex]
+        cursorRingRef.current.position.x = intersects[0].point.x
+        cursorRingRef.current.position.y = intersects[0].point.y
+    }
+    const startPaintTick = () => {
+        if (tickIntervalRef.current) return
+        tickIntervalRef.current = setInterval(() => {
+        const cellId = hoveredCellRef.current
+        if (cellId == null) return
+        
+        const centerCell = cellMap.cellById.get(cellId)
+        if (!isCellEditable(centerCell)) return  // center must be editable
+        
+        const cellsInRadius = getCellsInRadius(cellMap, cellId, brushSizeRef.current)
+        for (const [id, distance] of cellsInRadius.visited) {
+            const cell = cellMap.cellById.get(id)
+            
+            if (!isCellEditable(cell)) continue
+            
+            const falloff = (Math.cos((distance / brushSizeRef.current) * Math.PI) + 1) / 2
+            applyElevationChange(cell, activeToolRef.current, brushPowerRef.current * falloff, {alignTarget: alignTargetRef.current, smoothTarget: cellsInRadius.avgElevation})
+            updateCellColor(id, cell.elevation)
+        }
+        }, 50)
+    }
+    const stopPaintTick = () => {
+        if (tickIntervalRef.current) {
+            clearInterval(tickIntervalRef.current)
+            tickIntervalRef.current = null
+        }
+    }
+    const handleMouseDown = (event) => {
+        isMouseDownRef.current = true
+        updateHoveredCell(event)
+
+        if (activeToolRef.current === 'align') {
+            const cellId = hoveredCellRef.current
+            if (cellId != null) {
+                const cell = cellMap.cellById.get(cellId)
+                alignTargetRef.current = cell.elevation
+            }
+        }
+
+        startPaintTick()
+    }
+    const handleMouseMove = (event) => {
+            updateHoveredCell(event)
+    }
+    const handleMouseUp = () => {
+        isMouseDownRef.current = false
+        alignTargetRef.current = null
+        stopPaintTick()
+    }
+    //#endregion
+
 
     useEffect(() => {
         cameraRef.current = new THREE.OrthographicCamera(-4, 4, 2.5, -2.5, .01, 100)
@@ -113,7 +226,9 @@ function MapCanvas({ geometry, cellMap, onCellClick }) {
         cameraRef.current.position.z = 2
         handleResize()
         window.addEventListener('resize', handleResize)
-        canvasRef.current.addEventListener('click', handleClick)
+        canvasRef.current.addEventListener('mousedown', handleMouseDown)
+        window.addEventListener('mousemove', handleMouseMove)
+        window.addEventListener('mouseup', handleMouseUp)
 
         let animationId
         
@@ -125,6 +240,10 @@ function MapCanvas({ geometry, cellMap, onCellClick }) {
         return () => {
             cancelAnimationFrame(animationId)
             rendererRef.current.dispose()
+            canvasRef.current.removeEventListener('mousedown', handleMouseDown)
+            window.removeEventListener('mousemove', handleMouseMove)
+            window.removeEventListener('mouseup', handleMouseUp)
+            stopPaintTick()
         }
     }, [])
 
@@ -163,8 +282,18 @@ function MapCanvas({ geometry, cellMap, onCellClick }) {
     useEffect(() => {
         if (!sceneRef.current) return
         buildFrame()
+        buildRingCursor()
     }, [])
 
+    useEffect(() => { activeToolRef.current = activeTool }, [activeTool])
+    useEffect(() => { brushPowerRef.current = brushPower }, [brushPower])
+    useEffect(() => { 
+        const radius = brushSize * CELL_SIZE_APPROX
+        cursorRingRef.current.scale.set(radius, radius, 1)
+        brushSizeRef.current = brushSize 
+    }, [brushSize])
+    useEffect(() => { seaLevelRef.current = seaLevel }, [seaLevel])
+    
     return(
         <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
     )
