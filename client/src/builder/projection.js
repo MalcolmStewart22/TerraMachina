@@ -16,6 +16,7 @@ export function buildGeometry(cellMap) {
     const vertexArray = []
     const cellIdsToOffset = new Map()
     let cellOffset = 0;
+    const faceIndexToCellId = []
     
     for(const cell of cellMap.cells){
         
@@ -31,6 +32,7 @@ export function buildGeometry(cellMap) {
         if (spanX > Math.PI) continue 
 
         cellIdsToOffset.set(cell.geometry.cellId, cellOffset)
+        faceIndexToCellId.push(cell.geometry.cellId)
         cellOffset += 9
         for(let i = 0; i < 3; i++){
             vertexArray.push(screenPos[i].screenX)
@@ -38,5 +40,6 @@ export function buildGeometry(cellMap) {
             vertexArray.push(0)
         }
     }
-    return {vertices: new Float32Array(vertexArray), cellIdsToOffset}
+    return {vertices: new Float32Array(vertexArray), cellIdsToOffset, faceIndexToCellId}
 }
+
