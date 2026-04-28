@@ -1,10 +1,12 @@
 import { useRef, useEffect } from "react"
 
+const MAX_ZOOM = 10
+const MIN_ZOOM = 1
 export function useMapCameraControls({ canvasRef, mapCameraRef, onLeftMouseDown, onLeftMouseUp, onMouseMove, onZoom }){
     const isMouseDownRef = useRef(false)
     const isPanningRef = useRef(false)
     const lastPanPosRef = useRef({ x: 0, y: 0 })
-    
+
     
     const handleContextMenu = (event) => {
         event.preventDefault()
@@ -81,7 +83,8 @@ export function useMapCameraControls({ canvasRef, mapCameraRef, onLeftMouseDown,
         const zoomSpeed = 0.001
         const zoomDelta = -event.deltaY * zoomSpeed
         const currentZoom = mapCameraRef.current.zoom
-        const newZoom = Math.max(1, Math.min(10, currentZoom + zoomDelta))
+        if(currentZoom === MAX_ZOOM) return
+        const newZoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, currentZoom + zoomDelta))
         
         mapCameraRef.current.zoom = newZoom
         mapCameraRef.current.updateProjectionMatrix()
@@ -91,14 +94,16 @@ export function useMapCameraControls({ canvasRef, mapCameraRef, onLeftMouseDown,
     }
 
     useEffect(() => {
-            canvasRef.current.addEventListener('mousedown', handleMouseDown)
+            const canvas = canvasRef.current
+    
+        canvas.addEventListener('mousedown', handleMouseDown)
             window.addEventListener('mousemove', handleMouseMove)
             window.addEventListener('mouseup', handleMouseUp)
             canvasRef.current.addEventListener('wheel', handleWheel)
             document.addEventListener('contextmenu', handleContextMenu);
         
             return () => {
-                canvasRef.current.removeEventListener('mousedown', handleMouseDown)
+                canvas.removeEventListener('mousedown', handleMouseDown)
                 window.removeEventListener('mousemove', handleMouseMove)
                 window.removeEventListener('mouseup', handleMouseUp)
                 canvasRef.current.removeEventListener('wheel', handleWheel)
