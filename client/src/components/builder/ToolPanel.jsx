@@ -1,4 +1,4 @@
-function ToolPanel({ activeBrush, setActiveBrush, activeTool, setActiveTool, brushSize, setBrushSize, brushPower, setBrushPower}) {  
+function ToolPanel({ activeLayer, setActiveLayer, activeBrush, setActiveBrush, activeTool, setActiveTool, brushSize, setBrushSize, brushPower, setBrushPower,}) {  
     const selectedBrush = (brush) => {
         const base = "border-l border-r border-accent p-1 flex-1"
         const active = "bg-accent"
@@ -16,19 +16,21 @@ function ToolPanel({ activeBrush, setActiveBrush, activeTool, setActiveTool, bru
     const changeBrush = (brush) => {
         setActiveTool(null)
         setActiveBrush(activeBrush === brush ? null : brush)
+        setActiveLayer(brush) 
     }
     return (
     <div className="absolute top-[81%] left-1/2 -translate-x-1/2 flex-col border-2 border-accent w-64">
-      {/* button strip */}
-      <div className="flex  border-b border-elevated bg-elevated">
-        <button className={selectedBrush('elevation')} onClick={() => changeBrush('elevation')}>
-          Elevation
-        </button>
-        <button className={selectedBrush('biome')}  onClick={() => changeBrush('biome')}>
-          Biome
-        </button>
-        {/* more tool buttons later */}
-      </div>
+        <h1 className="flex justify-center">Brushes</h1>
+        {/* button strip */}
+        <div className="flex  border-b border-elevated bg-elevated">
+            <button className={selectedBrush('elevation')} onClick={() => changeBrush('elevation')}>
+            Elevation
+            </button>
+            <button className={selectedBrush('biome')}  onClick={() => changeBrush('biome')}>
+            Biome
+            </button>
+            {/* more tool buttons later */}
+        </div>
       
       {/* Tools*/}
       {activeBrush != null && (
@@ -51,9 +53,23 @@ function ToolPanel({ activeBrush, setActiveBrush, activeTool, setActiveTool, bru
                 </div>
             )}
             {activeBrush === 'biome' && (
-                <select className="border border-elevated bg-ink mt-1" onChange={e => setActiveTool(e.target.value)}>
-                    <option value="temperateForest">Temperate Forest</option>
-                    <option value="tropicalRainforest">Tropical Rainforest</option>
+                <select className="border border-elevated bg-ink mt-1" onChange={e => setActiveTool(e.target.value)} value={activeTool ?? ''}>
+                    <option value="">-- Select Biome --</option>
+                    <option value="TropicalRainforest">Tropical Rainforest</option>
+                    <option value="TropicalSeasonalRainforest">Tropical Seasonal Rainforest</option>
+                    <option value="Savanna">Savanna</option>
+                    <option value="TemperateRainforest">Temperate Rainforest</option>
+                    <option value="TemperateSeasonalRainforest">Temperate Seasonal Rainforest</option>
+                    <option value="BorealForest">Boreal Forest</option>
+                    <option value="Shrubland">Shrubland</option>
+                    <option value="TropicalWetland">Tropical Wetland</option>
+                    <option value="TemperateWetland">Temperate Wetland</option>
+                    <option value="BorealWetland">Boreal Wetland</option>
+                    <option value="TemperateGrassland">Temperate Grassland</option>
+                    <option value="HotDesert">Hot Desert</option>
+                    <option value="ColdDesert">Cold Desert</option>
+                    <option value="Tundra">Tundra</option>
+                    <option value="PolarDesert">Polar Desert</option>
                 </select>
         
             )}

@@ -2,15 +2,47 @@ const ELEVATION_STOPS = [
     { elevation: -5000, color: [0x2b/255, 0x5f/255, 0x7a/255] },
     { elevation: -100,  color: [0x6c/255, 0xa6/255, 0xc6/255] },
     { elevation: 0,     color: [0x9d/255, 0x95/255, 0x7b/255] },
-    { elevation: 500,   color: [0x51/255, 0x4c/255, 0x3c/255] },
-    { elevation: 2000,  color: [0x5e/255, 0x5c/255, 0x55/255] },
-    { elevation: 5000,  color: [0xab/255, 0xab/255, 0xab/255] },
+    { elevation: 1500,   color: [0x3d/255, 0x36/255, 0x1f/255] },
+    { elevation: 5000,  color: [0x51/255, 0x51/255, 0x51/255] },
+    { elevation: 10000,  color: [0xd5/255, 0xd5/255, 0xd5/255] },
 ]
+const BIOME_COLORS = {
+    TropicalRainforest:           [0x0D/255, 0x63/255, 0x20/255], //0D6320
+    TropicalSeasonalRainforest:   [0x3E/255, 0x70/255, 0x3A/255], //3e703a
+    TropicalWetland:              [0x09/255, 0x7E/255, 0x2E/255], //097E2E
+
+    TemperateRainforest:          [0x27/255, 0x53/255, 0x33/255], //275333
+    TemperateSeasonalRainforest:  [0x46/255, 0x68/255, 0x36/255], //466836
+    TemperateWetland:             [0x22/255, 0x5E/255, 0x3C/255], //225E3C
+    Shrubland:                    [0x65/255, 0x7F/255, 0x4D/255], //657f4d
+
+    BorealForest:                 [0x1F/255, 0x3F/255, 0x26/255], //1f3f26
+    BorealWetland:                [0x14/255, 0x46/255, 0x2C/255], //14462c
+
+    Savanna:                      [0xAF/255, 0xB6/255, 0x75/255], //afb675 ---were here in the color reformation
+    TemperateGrassland:           [0x76/255, 0x7F/255, 0x46/255], //767f46
+    Tundra:                       [0x3C/255, 0x44/255, 0x18/255], //3c4418
+
+    HotDesert:                    [0xBB/255, 0x9E/255, 0x6F/255], //BB9E6F
+    ColdDesert:                   [0xA7/255, 0x95/255, 0x6F/255], //A7956F
+    PolarDesert:                  [0xD5/255, 0xDC/255, 0xDB/255], //d5dcdb
+    
+    None:                         [0x8A/255, 0x8A/255, 0x8A/255]  //8a8a8a
+}
+/*
+#1F5F2D
+#3E7D3A
+#3A6B47
+#5A8447
+#157A4D
+#1B6641
+#0C4E35
+*/
 const EDITABLE_LATITUDE = 55 * Math.PI / 180 
 const EDITABLE_LONGITUDE = (180 - 10) * Math.PI / 180
 
 
-export function computeCellColor(elevation, seaLevel) {
+export function computeCellElevationColor(elevation, seaLevel) {
     const adjusted = elevation - seaLevel
     
     if (adjusted <= ELEVATION_STOPS[0].elevation) return ELEVATION_STOPS[0].color
@@ -31,7 +63,11 @@ export function computeCellColor(elevation, seaLevel) {
         }
     }
 }
-
+export function computeBiomeColor(cell, seaLevel) {
+    if (cell.elevation < seaLevel) return [0x2b/255, 0x5f/255, 0x7a/255]
+    if (!cell.biome) return BIOME_COLORS.None
+    return BIOME_COLORS[cell.biome] ?? BIOME_COLORS.None
+}
 export function applyElevationChange(cell, tool, power, options = {}) {
     const delta = power * 75  // In Meters
     const lerpAmount = power / 20 
@@ -59,6 +95,7 @@ export function applyElevationChange(cell, tool, power, options = {}) {
         // do nothing
         break
     }
+    if(cell.elevation > options.seaLevel) cell.isOcean = false
 }
 
 export function getCellsInRadius(cellMap, centerCellId, radius) {
