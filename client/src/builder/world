@@ -1,3 +1,5 @@
+import { GPUPrimitiveTopology } from "three/src/renderers/webgpu/utils/WebGPUConstants.js"
+
 export function createCellGeometry(cellId, position, vertices) {
   return {
     cellId,
@@ -48,4 +50,13 @@ export function createSpatialNode(){
         vertices: [],
         children: []
     }
+}
+
+export function createWorld(cellMap){
+  return {
+    surface: cellMap,
+    geology: {plates: [], boundaries: []},
+    hydrology: {seaLevel: 5000, riverNetworks: [], glaciers: [], aquifers: []},
+    circulation: {ocean: null, atmosphere: null}
+  }
 }

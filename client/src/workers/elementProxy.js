@@ -1,6 +1,6 @@
 let nextProxyId = 0;
 
-export class ElementProxy {
+export class elementProxy {
   constructor(element, worker, eventHandlers) {
     this.id = nextProxyId++;
     this.worker = worker;
