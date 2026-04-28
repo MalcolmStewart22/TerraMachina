@@ -1,14 +1,15 @@
 import HeaderLinks from "../components/HeaderLinks"
 import { useState, useEffect } from "react"
-import { generateSphere } from "../builder/Icosphere"
+import { generateSphere } from "../builder/icosphere"
 import { buildGeometry } from "../builder/projection"
 import MapCanvas from "../components/builder/MapCanvas"
 import ToolPanel from "../components/builder/ToolPanel"
 import LayerPanel from '../components/builder/LayerPanel'
+import { createWorld } from "../builder/world"
 
 
 function WorldBuilder() {
-  const [cellMap, setCellMap] = useState(null)
+  const [world, setWorld] = useState(null)
   const [geometry, setGeometry] = useState(null)
 
   const [activeBrush, setActiveBrush] = useState('elevation')
@@ -20,12 +21,12 @@ function WorldBuilder() {
   useEffect(() => {
     const map = generateSphere()
     const geo = buildGeometry(map)
-    setCellMap(map)
+    setWorld(createWorld(map))
     setGeometry(geo)
   }, [])
 
 
-    if (!cellMap) return <div>Generating world...</div>
+    if (!world) return <div>Generating world...</div>
 
   return(
     <div className="bg-base text-ink min-h-screen flex flex-col">
@@ -38,18 +39,17 @@ function WorldBuilder() {
             activeBrush={activeBrush}
             setActiveBrush={setActiveBrush}
             setActiveTool={setActiveTool}
+            activeBrush={activeBrush}
+            setActiveBrush={setActiveBrush}
           />
           <MapCanvas 
             geometry={geometry} 
-            cellMap={cellMap} 
+            world={world} 
             activeBrush={activeBrush}
             activeTool={activeTool}
             brushSize={brushSize}
             brushPower={brushPower}
-            seaLevel={5000}
             activeLayer={activeLayer}
-
-
           />
           <ToolPanel 
             activeLayer={activeLayer}
