@@ -6,7 +6,7 @@ function useEngineHub() {
 
     useEffect(() =>{
         const connection = new signalR.HubConnectionBuilder()
-            .withUrl('https://localhost:7078/hubs/engine')
+            .withUrl('terramachina-api.azurewebsites.net')
             .build()
 
         connection.on('WorldGenProgress', (update) => {
