@@ -63,7 +63,7 @@ const WorldSphere = forwardRef((props, ref) =>{
         )
         workerRef.current = worker
         
-        proxyRef.current = new ElementProxy(canvasRef.current, worker, eventHandlers);
+        proxyRef.current = new elementProxy(canvasRef.current, worker, eventHandlers);
         
         const offscreen = canvasRef.current.transferControlToOffscreen()
         workerRef.current.postMessage({type: 'init', canvas: offscreen, canvasId: proxyRef.current.id, width: window.innerWidth, height: window.innerHeight, pixelRatio: window.devicePixelRatio}, [offscreen])
