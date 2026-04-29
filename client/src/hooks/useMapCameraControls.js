@@ -96,17 +96,17 @@ export function useMapCameraControls({ canvasRef, mapCameraRef, onLeftMouseDown,
     useEffect(() => {
             const canvas = canvasRef.current
     
-        canvas.addEventListener('mousedown', handleMouseDown)
+            canvas.addEventListener('mousedown', handleMouseDown)
             window.addEventListener('mousemove', handleMouseMove)
             window.addEventListener('mouseup', handleMouseUp)
-            canvasRef.current.addEventListener('wheel', handleWheel)
+            canvas.addEventListener('wheel', handleWheel)
             document.addEventListener('contextmenu', handleContextMenu);
         
             return () => {
                 canvas.removeEventListener('mousedown', handleMouseDown)
                 window.removeEventListener('mousemove', handleMouseMove)
                 window.removeEventListener('mouseup', handleMouseUp)
-                canvasRef.current.removeEventListener('wheel', handleWheel)
+                canvas.removeEventListener('wheel', handleWheel)
                 document.removeEventListener('contextmenu', handleContextMenu);
             }
         }, [])

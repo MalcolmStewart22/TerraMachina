@@ -7,14 +7,13 @@ import { useMapCameraControls } from '../../hooks/useMapCameraControls'
 
 const RAYCASTER = new THREE.Raycaster()
 const MOUSE = new THREE.Vector2()
-const CELL_SIZE_APPROX = 0.018
+const CELL_SIZE_APPROX = 0.022
 
-function MapCanvas({ geometry, cellMap, seaLevel, activeTool, brushPower, brushSize, activeLayer }) {
+function MapCanvas({ geometry, world, activeTool, brushPower, brushSize, activeLayer }) {
     const activeLayerRef = useRef(activeLayer)
     const activeToolRef = useRef(activeTool)
     const brushPowerRef = useRef(brushPower)
     const brushSizeRef = useRef(brushSize)
-    const seaLevelRef = useRef(seaLevel)
 
     const canvasRef = useRef(null)
     const { mapSceneRef, mapCameraRef, frameSceneRef } 
@@ -56,10 +55,10 @@ function MapCanvas({ geometry, cellMap, seaLevel, activeTool, brushPower, brushS
         let color
         switch (activeLayerRef.current) {
             case 'elevation':
-                color = computeCellElevationColor(cell.elevation, seaLevelRef.current)
+                color = computeCellElevationColor(cell.elevation, world.hydrology.seaLevel)
                 break
             case 'biome':
-                color = computeBiomeColor(cell, seaLevelRef.current)
+                color = computeBiomeColor(cell, world.hydrology.seaLevel)
                 break
             default:
                 return
@@ -77,21 +76,21 @@ function MapCanvas({ geometry, cellMap, seaLevel, activeTool, brushPower, brushS
         colorAttr.needsUpdate = true
     }
     const recolorAllCells = () => {
-        if (!meshRef.current || !cellMap) return
+        if (!meshRef.current || !world.surface) return
         
         const colorAttr = meshRef.current.geometry.attributes.color
         
-        for (const cell of cellMap.cells) {
+        for (const cell of world.surface.cells) {
             const offset = geometry.cellIdsToOffset.get(cell.geometry.cellId)
             if (offset == null) continue
             
             let color
             switch (activeLayerRef.current) {
                 case 'elevation':
-                    color = computeCellElevationColor(cell.elevation, seaLevelRef.current)
+                    color = computeCellElevationColor(cell.elevation, world.hydrology.seaLevel)
                     break
                 case 'biome':
-                    color = computeBiomeColor(cell, seaLevelRef.current)
+                    color = computeBiomeColor(cell, world.hydrology.seaLevel)
                     break
             }
             
@@ -143,19 +142,19 @@ function MapCanvas({ geometry, cellMap, seaLevel, activeTool, brushPower, brushS
         const cellId = hoveredCellRef.current
         if (cellId == null) return
 
-        const cellsInRadius = getCellsInRadius(cellMap, cellId, brushSizeRef.current)
+        const cellsInRadius = getCellsInRadius(world.surface, cellId, brushSizeRef.current)
         for (const [id, distance] of cellsInRadius.visited) {
-            const cell = cellMap.cellById.get(id)
+            const cell = world.surface.cellById.get(id)
             
             if (!isCellEditable(cell)) continue
 
             switch(activeLayerRef.current){
                 case 'elevation':
                     const falloff = (Math.cos((distance / brushSizeRef.current) * Math.PI) + 1) / 2
-                    applyElevationChange(cell, activeToolRef.current, brushPowerRef.current * falloff, {alignTarget: alignTargetRef.current, smoothTarget: cellsInRadius.avgElevation, seaLevel: seaLevelRef.current})
+                    applyElevationChange(cell, activeToolRef.current, brushPowerRef.current * falloff, {alignTarget: alignTargetRef.current, smoothTarget: cellsInRadius.avgElevation, seaLevel: world.hydrology.seaLevel})
                     break
                 case 'biome':
-                    if (cell.elevation < seaLevelRef.current) continue
+                    if (cell.elevation < world.hydrology.seaLevel) continue
                     if (cell.biome === activeToolRef.current) continue
                     cell.biome = activeToolRef.current
                     break
@@ -179,7 +178,7 @@ function MapCanvas({ geometry, cellMap, seaLevel, activeTool, brushPower, brushS
             if (activeToolRef.current === 'align') {
                 const cellId = hoveredCellRef.current
                 if (cellId != null) {
-                    const cell = cellMap.cellById.get(cellId)
+                    const cell = world.surface.cellById.get(cellId)
                     alignTargetRef.current = cell.elevation
                 }
             }
@@ -224,7 +223,7 @@ function MapCanvas({ geometry, cellMap, seaLevel, activeTool, brushPower, brushS
         meshRef.current = new THREE.Mesh(meshGeometry,meshMaterial)
         mapSceneRef.current.add(meshRef.current)
 
-        const lineMaterial = new THREE.MeshBasicMaterial({ color: 0x000000, wireframe: true, side: THREE.DoubleSide})
+        const lineMaterial = new THREE.MeshBasicMaterial({ color: 0x000000, wireframe: true, side: THREE.DoubleSide, opacity: .04, transparent: true})
         let lines = new THREE.Mesh(meshGeometry, lineMaterial)
         mapSceneRef.current.add(lines)
 
@@ -239,7 +238,7 @@ function MapCanvas({ geometry, cellMap, seaLevel, activeTool, brushPower, brushS
 
     useEffect(() => {
         activeLayerRef.current = activeLayer 
-        if (!meshRef.current || !cellMap) return        
+        if (!meshRef.current || !world.surface) return        
         recolorAllCells()
     }, [activeLayer])
     
@@ -250,9 +249,8 @@ function MapCanvas({ geometry, cellMap, seaLevel, activeTool, brushPower, brushS
         brushSizeRef.current = brushSize 
     }, [brushSize])
     useEffect(() => { 
-        seaLevelRef.current = seaLevel
         recolorAllCells() 
-    }, [seaLevel])
+    }, [world.hydrology.seaLevel])
     
     return(
         <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
