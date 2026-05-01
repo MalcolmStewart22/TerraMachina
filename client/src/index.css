@@ -3,15 +3,19 @@
 
 
 @theme {
-  --color-base: #0A0F0D;
-  --color-elevated: #141D16;
-  --color-ink: #E8ECE9;
-  --color-muted: #8E988F;
-  --color-accent: #47614A;
+  --color-base: #0e1014;            /*Background*/
+  --color-elevated: #1f140c;        /*card*/
+  --color-elevatedLight: #363430            ;
+  --color-ink: #d4cdb8;             /*text*/
+  --color-muted: #9a9482;           /*text Muted*/
+  --color-accent: #c8744a;          /*Copper Accent*/
+  --color-structureAccent: #6a9080; /*Structure Accent*/
   --font-custom: "Inter";
   --font-title: "Spectral SC", "Inter";
 }
 
+
+/*TODO CONVERT THIS LATER!*/
 input {
     border-width: 2px;
     width: fit-content;

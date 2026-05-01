@@ -19,7 +19,7 @@ const BIOME_COLORS = {
     BorealForest:                 [0x1F/255, 0x3F/255, 0x26/255], //1f3f26
     BorealWetland:                [0x14/255, 0x46/255, 0x2C/255], //14462c
 
-    Savanna:                      [0xAF/255, 0xB6/255, 0x75/255], //afb675 ---were here in the color reformation
+    Savanna:                      [0xAF/255, 0xB6/255, 0x75/255], //afb675 
     TemperateGrassland:           [0x76/255, 0x7F/255, 0x46/255], //767f46
     Tundra:                       [0x3C/255, 0x44/255, 0x18/255], //3c4418
 
@@ -29,15 +29,7 @@ const BIOME_COLORS = {
     
     None:                         [0x8A/255, 0x8A/255, 0x8A/255]  //8a8a8a
 }
-/*
-#1F5F2D
-#3E7D3A
-#3A6B47
-#5A8447
-#157A4D
-#1B6641
-#0C4E35
-*/
+
 const EDITABLE_LATITUDE = 55 * Math.PI / 180 
 const EDITABLE_LONGITUDE = (180 - 10) * Math.PI / 180
 

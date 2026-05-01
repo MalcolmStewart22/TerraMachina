@@ -36,7 +36,7 @@ export function useBuildFrame(frameSceneRef){
                 new THREE.Vector3(-3.1, 1.1, 0),
             ]
             const borderGeometry = new THREE.BufferGeometry().setFromPoints(borderPoints)
-            const borderMaterial = new THREE.LineBasicMaterial({ color: 0x4a3a28 })
+            const borderMaterial = new THREE.LineBasicMaterial({ color: 0x1f140c })
             const border = new THREE.LineLoop(borderGeometry, borderMaterial)
             border.position.z = 0.02
             frameSceneRef.current.add(border)
@@ -79,7 +79,7 @@ export function useBuildFrame(frameSceneRef){
             bgRect.holes.push(bgHole)
     
             const bgGeometry = new THREE.ShapeGeometry(bgRect)
-            const bgMaterial = new THREE.MeshBasicMaterial({ color: 0x2a1f15 })
+            const bgMaterial = new THREE.MeshBasicMaterial({ color: 0x1f140c })
             const bgMesh = new THREE.Mesh(bgGeometry, bgMaterial)
             bgMesh.position.z = 0 
             frameSceneRef.current.add(bgMesh)

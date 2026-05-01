@@ -1,7 +1,7 @@
 function LayerPanel({ activeLayer, setActiveLayer, activeBrush, setActiveBrush, setActiveTool}) {  
     const selectedLayer = (layer) => {
-        const base = "border-l border-r border-accent p-1 flex-1"
-        const active = "bg-accent"
+        const base = "p-1 flex-1"
+        const active = "bg-accent text-ink"
         const inactive = "text-muted hover:text-ink"
         return `${base} ${activeLayer === layer ? active : inactive}`
     }
@@ -14,9 +14,9 @@ function LayerPanel({ activeLayer, setActiveLayer, activeBrush, setActiveBrush, 
     }
     
     return (
-    <div className="absolute left-[2%] top-1/4 -translate-y-1/2 z-1 flex border-2 border-accent h-64">
+    <div className="absolute left-[1%] top-1/4 -translate-y-1/2 z-1 flex border-2 border-accent h-64">
       {/* button strip */}
-      <div className="flex flex-col  border-b border-elevated bg-elevated">
+      <div className="flex flex-col border-r border-elevated bg-elevatedLight">
         <button className={selectedLayer('elevation')} onClick={() => changeLayer('elevation')}>
           Elevation
         </button>
@@ -28,12 +28,15 @@ function LayerPanel({ activeLayer, setActiveLayer, activeBrush, setActiveBrush, 
       
       {/* Tools*/}
       {activeLayer != null && (
-        <div className=" flex-col bg-muted text-base border-elevated flex items-center">
+        <div className=" flex-col bg-elevatedLight text-ink border-elevatedLight flex items-center">
             {/* Elevation*/}
             {activeLayer === 'elevation' && (
-                <div className="p-2 flex gap-1">
-     
+              <div>
+                <div className="p-2 flex-col flex gap-1 border-b border-elevated">
+                  <label> Sea Level:</label>
+                  <input type="range" min="1500" max="8000" style={{width: 75}}/>
                 </div>
+              </div>
             )}
             {activeLayer === 'biome' && (
                 <div className="flex flex-col mb-1">

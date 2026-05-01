@@ -1,15 +1,15 @@
 function ToolPanel({ activeLayer, setActiveLayer, activeBrush, setActiveBrush, activeTool, setActiveTool, brushSize, setBrushSize, brushPower, setBrushPower,}) {  
     const selectedBrush = (brush) => {
-        const base = "border-l border-r border-accent p-1 flex-1"
+        const base = "p-1 flex-1"
         const active = "bg-accent"
         const inactive = "text-muted hover:text-ink"
         return `${base} ${activeBrush === brush ? active : inactive}`
     }
 
     const selectedTool = (tool) => {
-        const base = "border border-elevated p-1"
+        const base = "border border-accent p-1"
         const active = "bg-accent text-ink"
-        const inactive = "hover:text-ink"
+        const inactive = "hover:text-muted"
         return `${base} ${activeTool === tool ? active : inactive}`
     }
     
@@ -19,10 +19,9 @@ function ToolPanel({ activeLayer, setActiveLayer, activeBrush, setActiveBrush, a
         setActiveLayer(brush) 
     }
     return (
-    <div className="absolute top-[81%] left-1/2 -translate-x-1/2 flex-col border-2 border-accent w-64">
-        <h1 className="flex justify-center">Brushes</h1>
+    <div className="absolute top-[81%] left-1/2 -translate-x-1/2 flex-col border-1 border-accent w-64">
         {/* button strip */}
-        <div className="flex  border-b border-elevated bg-elevated">
+        <div className="flex  border-b border-elevated bg-elevatedLight">
             <button className={selectedBrush('elevation')} onClick={() => changeBrush('elevation')}>
             Elevation
             </button>
@@ -34,7 +33,7 @@ function ToolPanel({ activeLayer, setActiveLayer, activeBrush, setActiveBrush, a
       
       {/* Tools*/}
       {activeBrush != null && (
-        <div className=" flex-col bg-muted text-base border-elevated flex items-center">
+        <div className=" flex-col bg-elevatedLight text-ink border-elevatedLight flex items-center">
             {/* Elevation*/}
             {activeBrush === 'elevation' && (
                 <div className="p-2 flex gap-1">
@@ -53,7 +52,7 @@ function ToolPanel({ activeLayer, setActiveLayer, activeBrush, setActiveBrush, a
                 </div>
             )}
             {activeBrush === 'biome' && (
-                <select className="border border-elevated bg-ink mt-1" onChange={e => setActiveTool(e.target.value)} value={activeTool ?? ''}>
+                <select className="border border-accent bg-elevatedLight text-ink mt-1" onChange={e => setActiveTool(e.target.value)} value={activeTool ?? ''}>
                     <option value="">-- Select Biome --</option>
                     <option value="TropicalRainforest">Tropical Rainforest</option>
                     <option value="TropicalSeasonalRainforest">Tropical Seasonal Rainforest</option>
